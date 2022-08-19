@@ -60,6 +60,7 @@ module.exports = {
   entry: {
     manifest: path.join(sourcePath, 'manifest.json'),
     background: path.join(sourcePath, 'Background', 'index.ts'),
+    serviceworker: path.join(sourcePath, 'Background', 'service-worker.ts'),
     contentScript: path.join(sourcePath, 'ContentScript', 'index.ts'),
     popup: path.join(sourcePath, 'Popup', 'index.tsx'),
     options: path.join(sourcePath, 'Options', 'index.tsx'),
