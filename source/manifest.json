@@ -18,13 +18,13 @@
   "permissions": [
     "activeTab",
     "cookies",
-    "storage"
+    "storage",
+    "tabs"
   ],
 
   "__chrome|opera__host_permissions": [
-    "https://sentry.io/*",
-    "https://dev.getsentry.net/*",
-    "https://*.sentry.dev/*"
+    "http://*/*",
+    "https://*/*"
   ],
 
   "__firefox__content_security_policy": "script-src 'self'; object-src 'self'",
@@ -83,9 +83,8 @@
 
   "content_scripts": [{
     "matches": [
-      "https://sentry.io/*",
-      "https://dev.getsentry.net/*",
-      "https://*.sentry.dev/*"
+      "http://*/*",
+      "https://*/*"
     ],
     "js": [
       "js/contentScript.bundle.js"

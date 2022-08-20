@@ -22,7 +22,15 @@
 		"node/no-unsupported-features/es-syntax": ["error", {
 			"ignores": ["modules"]
 		}],
-		"@typescript-eslint/explicit-function-return-type": "off"
+		"@typescript-eslint/explicit-function-return-type": "off",
+		"@typescript-eslint/explicit-module-boundary-types": "off",
+		"@typescript-eslint/no-unused-vars": ["error", {
+			"argsIgnorePattern": "^_",
+			"caughtErrorsIgnorePattern": "^-",
+			"destructuredArrayIgnorePattern": "^_",
+			"varsIgnorePattern": "^_"
+		}]
+
 	},
 	"env": {
 		"webextensions": true
