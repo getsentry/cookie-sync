@@ -3,16 +3,17 @@
 @import "../styles/variables";
 
 body {
-  color: $black;
-  background-color: $greyWhite;
+  color: $gray500;
+  background-color: $surface100;
 }
 
 #popup {
   min-width: 350px;
-  padding: 30px 20px;
+  padding: 20px 20px;
 
-  h2 {
-    font-size: 25px;
+  h1 {
+    font-size: 1.625rem;
+    font-weight: 600;
     text-align: center;
   }
 
@@ -22,4 +23,44 @@ body {
   dd {
     margin-left: 1em;
   }
+}
+
+.sync-button {
+  border-radius: 4px;
+  display: inline-block;
+  border-radius: 4px;
+  text-transform: none;
+  font-weight: 600;
+  color: #FFFFFF;
+  background-color: #7669D3;
+  border: 1px solid #7669D3;
+  height: 34px;
+  font-size: 0.875rem;
+  line-height: 1rem;
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  box-shadow: 0 1px 4px rgb(10 8 12 / 20%);
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+
+.result {
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+}
+
+.error-alert {
+  color: $red300;
+  display: flex;
+  gap: 8px;
+}
+
+.success-row {
+  color: $green400;
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
