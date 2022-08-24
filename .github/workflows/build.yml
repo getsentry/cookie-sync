@@ -14,11 +14,12 @@ jobs:
       node-version: 16.x # See Node.js release schedule: https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ env.DAY_OF_WEEK }}
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Build with Node v${{ env.node-version }}
       uses: actions/setup-node@v3
       with:
-        node-version: ${{ env.DAY_OF_WEEK }}
+        node-version: ${{ env.node-version }}
         cache: 'yarn'
     - run: yarn install --frozen-lockfile
     - run: yarn run build
