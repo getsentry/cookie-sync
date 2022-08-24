@@ -23,7 +23,8 @@ jobs:
     - run: yarn install --frozen-lockfile
     - run: yarn run build
 
-    - uses: "marvinpinto/action-automatic-releases@latest"
+    - name: Create Github Release
+      uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
