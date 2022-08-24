@@ -1,0 +1,39 @@
+name: Node.js CI
+
+on:
+  push:
+    branches:
+      - main
+      - build
+      - 'releases/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      node-version: 16.x # See Node.js release schedule: https://nodejs.org/en/about/releases/
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Build with Node v${{ env.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.node-version }}
+        cache: 'yarn'
+    - run: yarn install --frozen-lockfile
+    - run: yarn run build
+
+    - name: Create Github Release
+      if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/tags/releases/*' }}
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        title: "Development Build"
+        prerelease: ${{ github.ref_type == 'branch' }}
+        draft: false
+        files: |
+          extension/chrome.zip
+          extension/firefox.xpi
+          extension/opera.crx
