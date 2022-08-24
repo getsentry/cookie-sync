@@ -25,13 +25,13 @@ jobs:
     - run: yarn run build
 
     - name: Create Github Release
-      if: ${{ github.ref_name == 'build' }}
+      if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/tags/releases/*' }}
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
         title: "Development Build"
-        prerelease: true
+        prerelease: ${{ github.ref_type == 'branch' }}
         draft: false
         files: |
           extension/chrome.zip
