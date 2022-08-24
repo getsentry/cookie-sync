@@ -19,11 +19,23 @@ const settingsCache: State = {
 
 async function initSettingsCache() {
   const data = await browser.storage.sync.get(null);
-  Object.assign(settingsCache, {
-    cookieName: data.cookieName,
-    sourceUrl: new URL(data.sourceUrl),
-    targetUrls: data.targetUrls.map((s: string) => new URL(s)),
-  });
+  if (data.cookieName) {
+    Object.assign(settingsCache, {
+      cookieName: data.cookieName,
+    });
+  }
+
+  if (data.sourceUrl) {
+    Object.assign(settingsCache, {
+      sourceUrl: new URL(data.sourceUrl),
+    });
+  }
+
+  if (data.targetUrls) {
+    Object.assign(settingsCache, {
+      targetUrls: data.targetUrls.map((s: string) => new URL(s)),
+    });
+  }
 }
 
 async function fetchSourceCookie() {
@@ -95,6 +107,7 @@ async function onCookieChanged(changeInfo: Cookies.OnChangedChangeInfoType) {
   
   browser.runtime.onMessage.addListener(async (
     request: Record<string, string>,
+    // @ts-expect-error
     sender: Runtime.MessageSender,
   ) => {
     if (request.command === "sync-now") {
@@ -106,9 +119,6 @@ async function onCookieChanged(changeInfo: Cookies.OnChangedChangeInfoType) {
     }
     return false;
   });
-
-  const [urls, cookie] = await Promise.all([getTargetUrls(), fetchSourceCookie()]);
-  setTargetCookies(urls, cookie);
 })();
 
 export {};

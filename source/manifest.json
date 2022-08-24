@@ -2,7 +2,7 @@
   "__chrome|opera|edge__manifest_version": 3,
   "__firefox__manifest_version": 2,
 
-  "name": "Sample WebExtension",
+  "name": "Sentry Cookie Sync",
   "version": "0.0.0",
 
   "icons": {
@@ -54,7 +54,7 @@
       "48": "assets/icons/favicon-48.png",
       "128": "assets/icons/favicon-128.png"
     },
-    "default_title": "tiny title",
+    "default_title": "Sentry Cookie Sync",
     "browser_style": false
   },
   "__chrome|opera__action": {
@@ -65,7 +65,7 @@
       "48": "assets/icons/favicon-48.png",
       "128": "assets/icons/favicon-128.png"
     },
-    "default_title": "tiny title"
+    "default_title": "Sentry Cookie Sync"
   },
 
   "__chrome|opera__options_page": "options.html",
