@@ -11,9 +11,9 @@
     "48": "assets/icons/favicon-48.png",
     "128": "assets/icons/favicon-128.png"
   },
-  "description": "Sample description",
+  "description": "Sync cookies for sentry local frontend development",
   "homepage_url": "https://github.com/abhijithvijayan/web-extension-starter",
-  "short_name": "Sample Name",
+  "short_name": "Cookie Sync",
 
   "permissions": [
     "activeTab",
@@ -23,8 +23,9 @@
   ],
 
   "__chrome|opera__host_permissions": [
-    "http://*/*",
-    "https://*/*"
+    "https://*.sentry.dev/*",
+    "https://dev.getsentry.net/*",
+    "https://sentry.io/*"
   ],
 
   "__firefox__content_security_policy": "script-src 'self'; object-src 'self'",
@@ -83,8 +84,9 @@
 
   "content_scripts": [{
     "matches": [
-      "http://*/*",
-      "https://*/*"
+      "https://*.sentry.dev/*",
+      "https://dev.getsentry.net/*",
+      "https://sentry.io/*"
     ],
     "js": [
       "js/contentScript.bundle.js"
