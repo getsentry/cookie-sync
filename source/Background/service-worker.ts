@@ -1,4 +1,4 @@
-import {browser, Cookies, Runtime} from 'webextension-polyfill-ts';
+import browser, {Cookies, Runtime} from 'webextension-polyfill';
 
 console.log('Cookie Sync Service Worker is starting...');
 

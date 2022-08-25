@@ -1,0 +1,13 @@
+@import "../styles/reset.css";
+@import "../styles/variables.css";
+
+@import "../../node_modules/webext-base-css/webext-base.css";
+
+body {
+  color: var(--black);
+  background-color: var(--greyWhite);
+}
+
+input {
+  border: 1px solid var(--skyBlue);
+}
