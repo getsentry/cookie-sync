@@ -1,28 +1,20 @@
-@import "../styles/fonts";
-@import "../styles/reset";
-@import "../styles/variables";
+@import "../styles/reset.css";
+@import "../styles/variables.css";
 
 body {
-  color: $gray500;
-  background-color: $surface100;
+  color: var(--gray500);
+  background-color: var(--surface100);
 }
 
 #popup {
   min-width: 350px;
   padding: 20px 20px;
+}
 
-  h1 {
-    font-size: 1.625rem;
-    font-weight: 600;
-    text-align: center;
-  }
-
-  dt {
-     margin-top: 1em;
-  }
-  dd {
-    margin-left: 1em;
-  }
+h1 {
+  font-size: 1.625rem;
+  font-weight: 600;
+  text-align: center;
 }
 
 .sync-button {
@@ -53,13 +45,13 @@ body {
 }
 
 .error-alert {
-  color: $red300;
+  color: var(--red300);
   display: flex;
   gap: 8px;
 }
 
 .success-row {
-  color: $green400;
+  color: var(--green400);
   display: flex;
   gap: 8px;
   align-items: center;

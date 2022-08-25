@@ -1,0 +1,19 @@
+:root {
+  /* colors */
+  --black: #0d0d0d;
+  --greyWhite: #f3f3f3;
+  --skyBlue: #8892b0;
+
+  /* DarkTheme Colors from theme.tsx from sentry */
+  --surface100: #1A141F;
+
+  --gray500: #EBE6EF;
+  --gray400: #D6D0DC;
+  --gray300: #998DA5;
+  --gray200: #43384C;
+  --gray100: #342B3B;
+
+  --red300: #F55459;
+
+  --green400: #26B593;
+}

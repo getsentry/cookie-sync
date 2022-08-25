@@ -1,10 +1,10 @@
-import { browser } from 'webextension-polyfill-ts';
+import browser from 'webextension-polyfill';
 import * as React from 'react';
 
 import FailedIcon from './icons/FailedIcon';
 import SuccessIcon from './icons/SuccessIcon';
 
-import './styles.scss';
+import './popup.css';
 
 const Popup: React.FC = () => {
   const [result, setResult] = React.useState<any[] | string | null>(null);

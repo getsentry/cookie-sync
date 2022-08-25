@@ -1,9 +1,9 @@
-import {browser} from 'webextension-polyfill-ts';
+import browser from 'webextension-polyfill';
 import * as React from 'react';
 
 import UrlInput from './UrlInput';
 
-import './styles.scss';
+import './styles.css';
 
 type State = {
   cookieName: string;
@@ -16,10 +16,7 @@ export default function Options() {
   const [state, setState] = React.useState<State>({
     cookieName: 'session',
     sourceUrl: new URL('https://sentry.io'),
-    targetUrls: [
-      new URL('https://dev.getsentry.net'),
-      new URL('https://*.sentry.dev/'),
-    ],
+    targetUrls: [new URL('https://dev.getsentry.net'), new URL('https://*.sentry.dev/')],
   });
 
   const loadStorage = async () => {
@@ -48,7 +45,7 @@ export default function Options() {
     saveState(state);
   }, [state]);
 
-  console.log({state});
+  console.log({ state });
 
   return (
     <div>
@@ -67,12 +64,7 @@ export default function Options() {
           />
         </p>
 
-        <UrlInput
-          key="sourceUrl"
-          id="sourceUrl"
-          label="Source URL"
-          url={state.sourceUrl}
-        />
+        <UrlInput key="sourceUrl" id="sourceUrl" label="Source URL" url={state.sourceUrl} />
 
         {state.targetUrls.map((url, i) => (
           <UrlInput
