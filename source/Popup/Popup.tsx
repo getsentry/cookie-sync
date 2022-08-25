@@ -1,9 +1,10 @@
 import { browser } from 'webextension-polyfill-ts';
 import * as React from 'react';
 
-import './styles.scss';
 import FailedIcon from './icons/FailedIcon';
 import SuccessIcon from './icons/SuccessIcon';
+
+import './styles.scss';
 
 const Popup: React.FC = () => {
   const [result, setResult] = React.useState<any[] | string | null>(null);
@@ -50,7 +51,7 @@ const Popup: React.FC = () => {
           ? result.map((res, index) => (
               <div key={index} className="success-row">
                 <SuccessIcon width={20} height={20} />
-                <div>{res.value.domain}</div>
+                <div>{decodeURI(res.value.domain)}</div>
               </div>
             ))
           : null}
