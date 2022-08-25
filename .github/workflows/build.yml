@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - build
+    tags: 
       - 'releases/**'
 
 jobs:
