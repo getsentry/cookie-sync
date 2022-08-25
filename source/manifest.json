@@ -53,11 +53,6 @@
     "default_popup": "popup.html",
     "default_title": "Sentry Cookie Sync"
   },
-  "__chrome|opera__options_page": "options.html",
-  "options_ui": {
-    "page": "options.html",
-    "open_in_tab": true
-  },
 
   "background": {
     "__firefox__scripts": [
