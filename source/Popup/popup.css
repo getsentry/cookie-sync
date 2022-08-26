@@ -56,3 +56,10 @@ h1 {
   gap: 8px;
   align-items: center;
 }
+
+.error-row {
+  color: var(--red400);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}

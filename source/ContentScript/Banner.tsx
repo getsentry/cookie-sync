@@ -5,7 +5,7 @@ import FailedIcon from "../icons/FailedIcon";
 import useSyncNow from '../useSyncNow';
 
 export default function Banner() {
-  const { result, isLoading: _1, isError, syncNow } = useSyncNow();
+  const {syncNow, error } = useSyncNow();
 
   return (
     <React.Fragment>
@@ -15,12 +15,9 @@ export default function Banner() {
           <button
             className="sync-button"
             onClick={async () => {
-              const { result, isError } = await syncNow();
-              console.log({ result, isError });
-              if (!isError && result?.length) {
+              const { results, error } = await syncNow();
+              if (!error && results?.length) {
                 const target = window.location.origin + "/";
-                console.log("Navigating to", target);
-
                 window.location.href = target;
               }
             }}
@@ -29,12 +26,14 @@ export default function Banner() {
           </button>
         </div>
 
-        {isError ? (
+        {error ? (
           <div className="error-alert">
             <div>
               <FailedIcon width={24} height={24} />
-              <div>{result}</div>
-              <a target="_blank" href="https://sentry.io/auth/login/">Login</a>
+              <div>{error}</div>
+              <a target="_blank" href="https://sentry.io/auth/login/">
+                Login
+              </a>
             </div>
           </div>
         ) : null}

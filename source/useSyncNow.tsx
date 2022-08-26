@@ -1,43 +1,70 @@
 import * as React from "react";
-import browser from "webextension-polyfill";
+import browser, {Cookies} from "webextension-polyfill";
+
+type State = {
+  isLoading: boolean;
+  results: undefined | PromiseSettledResult<Cookies.Cookie>[];
+  error: undefined | Error;
+};
 
 export default function useSyncNow() {
-  const [result, setResult] = React.useState<any[] | string | null>(null);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [isError, setIsError] = React.useState(false);
+  const [state, setState] = React.useState<State>({
+    isLoading: false,
+    results: undefined,
+    error: undefined,
+  });
 
   const syncNow = React.useCallback(async () => {
-    setIsLoading(true);
-    setIsError(false);
-    setResult(null);
+    setState({
+      isLoading: true,
+      error: undefined,
+      results: undefined,
+    });
 
     try {
-      const resp = await browser.runtime.sendMessage({ command: "sync-now" });
-      setResult(resp);
-      return {
-        result: resp,
+      const results = (await browser.runtime.sendMessage({
+        command: "sync-now",
+      })) as Error | PromiseSettledResult<Cookies.Cookie>[];
+
+      if (results instanceof Error) {
+        setState({
+          isLoading: false,
+          results: undefined,
+          error: results,
+        });
+        return {
+          isLoading: false,
+          results: undefined,
+          error: results,
+        };
+      }
+
+      setState({
         isLoading: false,
-        isError: false,
-      };
-    } catch (err: any) {
-      setResult(err.message);
-      setIsError(true);
-      console.error(err);
+        results: results,
+        error: undefined,
+      });
       return {
-        result: null,
         isLoading: false,
-        isError: err,
+        results: results,
+        error: undefined,
       };
-    } finally {
-      setIsLoading(false);
+    } catch (err: unknown) {
+      setState({
+        isLoading: false,
+        results: undefined,
+        error: err as Error,
+      });
+      return {
+        isLoading: false,
+        results: undefined,
+        error: err as Error,
+      };
     }
-    
   }, []);
 
   return {
-    result,
-    isLoading,
-    isError,
     syncNow,
+    ...state
   };
 }
