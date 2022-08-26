@@ -71,6 +71,12 @@ function urlToTabsQueryPattern(url: URL) {
   return `${decodeURI(url.toString())}*`;
 }
 
+async function checkAuthStatus() {
+  const response = await fetch('https://sentry.io/api/0/internal/health/');
+  console.log("health say", response.ok);
+  return response.ok;
+}
+
 async function getTargetUrls() {
   const storageTargets = settingsCache.targetUrls.map(urlToCookieTarget);
 
@@ -86,6 +92,11 @@ async function getTargetUrls() {
 }
 
 async function onCookieChanged(changeInfo: Cookies.OnChangedChangeInfoType) {
+  if (!await checkAuthStatus()) {
+    console.log('Logged out of sentry.io');
+    return;
+  }
+
   const {cookie} = changeInfo;
   if (cookie.domain === settingsCache.sourceUrl.host && cookie.name === settingsCache.cookieName) {
     try {
@@ -112,6 +123,12 @@ async function onCookieChanged(changeInfo: Cookies.OnChangedChangeInfoType) {
   ) => {
     if (request.command === "sync-now") {
       console.log('Syncing cookies now...');
+
+      if (!await checkAuthStatus()) {
+        console.log('You are logged out of sentry.io');
+        throw new Error('You are logged out of Sentry.io.');
+      }
+
       const [urls, cookie] = await Promise.all([getTargetUrls(), fetchSourceCookie()])
       const result = await setTargetCookies(urls, cookie);
       console.log('Sync complete', result);

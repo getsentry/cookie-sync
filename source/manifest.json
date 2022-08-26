@@ -63,9 +63,8 @@
 
   "content_scripts": [{
     "matches": [
-      "https://*.sentry.dev/*",
-      "https://dev.getsentry.net/*",
-      "https://sentry.io/*"
+      "https://*.sentry.dev/auth/login/",
+      "https://dev.getsentry.net/auth/login/"
     ],
     "js": [
       "js/contentScript.bundle.js"

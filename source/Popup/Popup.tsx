@@ -1,32 +1,20 @@
-import browser from 'webextension-polyfill';
 import * as React from 'react';
 
-import FailedIcon from './icons/FailedIcon';
-import SuccessIcon from './icons/SuccessIcon';
+import FailedIcon from '../icons/FailedIcon';
+import SuccessIcon from '../icons/SuccessIcon';
+
+import useSyncNow from '../useSyncNow';
 
 import './popup.css';
 
-const Popup: React.FC = () => {
-  const [result, setResult] = React.useState<any[] | string | null>(null);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [isError, setIsError] = React.useState(false);
+const Popup = () => {
+  const { result, isLoading, isError, syncNow } = useSyncNow();
 
-  const syncNow = React.useCallback(async () => {
-    setIsLoading(true);
-    setIsError(false);
-    setResult(null);
-
-    try {
-      const resp = await browser.runtime.sendMessage({ command: 'sync-now' });
-      setResult(resp);
-    } catch (err: any) {
-      setResult(err.message);
-      setIsError(true);
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  console.log({
+    result,
+    isError,
+    isLoading,
+  });
 
   return (
     <section id="popup">
