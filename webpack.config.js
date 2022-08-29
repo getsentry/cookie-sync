@@ -34,10 +34,6 @@ const extensionReloaderPlugin =
       };
 
 const getExtensionFileType = (browser) => {
-  if (browser === 'opera') {
-    return 'crx';
-  }
-
   if (browser === 'firefox') {
     return 'xpi';
   }

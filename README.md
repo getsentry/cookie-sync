@@ -5,20 +5,26 @@ your sentry devapp and vercel sandboxes.
 
 ## 🚀 Installation
 
-1. You can download the bundled extension for your browser from the github releases page [here](https://github.com/getsentry/hackweek-cookie-sync/releases/tag/latest)
+You can download the bundled extension for your browser from the github releases page [here](https://github.com/getsentry/hackweek-cookie-sync/releases/tag/latest).
 
-- ### Chrome
+_NOTE: This plugin will not auto-update_
 
-    1. Visit: [chrome://extensions](chrome://extensions)
-    2. Enable `Developer Mode` in the top-right corner of the screen.
+- ### Chromium Based Browsers (Chrome, Edge, Opera)
+
+    1. Visit: [chrome://extensions](chrome://extensions) or [edge://extensions](edge://extensions) or [about://extensions](about://extensions) (in opera).
+    2. Enable `Developer Mode`. Toggle is in the top-right corner (Chrome, Opera) or left sidebar (Edge)
         1. If you just enabled developer mode refresh the page.
     3. Drag & drop the `.zip` file you downloaded into the page.
-    4. Done!
 
 - ### Firefox
 
-    - The Addin is build as an unsigned xpi
-    - Follow Mozilla instructions [here](https://support.mozilla.org/en-US/kb/add-on-signing-in-firefox#w_what-are-my-options-if-i-want-to-use-an-unsigned-add-on-advanced-users)
+    1. Get an [ESR](https://www.mozilla.org/en-US/firefox/enterprise/), [Developer](https://www.mozilla.org/en-US/firefox/developer/), or [Nightly build](https://www.mozilla.org/en-US/firefox/channel/desktop/#nightly) of firefox.
+    2. Follow Mozilla's instructions to enable installing unsigned addons [here](https://support.mozilla.org/en-US/kb/add-on-signing-in-firefox#w_what-are-my-options-if-i-want-to-use-an-unsigned-add-on-advanced-users).
+      - Visit [about:config](about:config)
+      - Set `xpinstall.signatures.required = false`
+      - Set `extensions.langpacks.signatures.required = false`
+    3. Visit [about:addons](about:addons)
+    4. Drag & drop the `firefox.crx` file you downloaded into the page.
 
 ## 🖥️ Developing
 
@@ -32,10 +38,8 @@ Then run the following:
 - `yarn install` to install dependencies.
 - `yarn run dev:chrome` to start the development server for chrome extension
 - `yarn run dev:firefox` to start the development server for firefox addon
-- `yarn run dev:opera` to start the development server for opera extension
 - `yarn run build:chrome` to build chrome extension
 - `yarn run build:firefox` to build firefox addon
-- `yarn run build:opera` to build opera extension
 - `yarn run build` builds and packs extensions all at once to extension/ directory
 
 ### Development
@@ -47,6 +51,8 @@ Then run the following:
     - `yarn run dev:chrome`
   - Firefox
     - `yarn run dev:firefox`
+  - Edge
+    - `yarn run dev:edge`
   - Opera
     - `yarn run dev:opera`
 
@@ -63,11 +69,6 @@ Then run the following:
 
   - Load the Add-on via `about:debugging` as temporary Add-on.
   - Choose the `manifest.json` file in the extracted directory
-
-- ### Opera
-
-  - Load the extension via `opera:extensions`
-  - Check the `Developer Mode` and load as unpacked from extension’s extracted directory.
 
 ### Production
 
