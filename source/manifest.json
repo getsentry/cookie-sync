@@ -1,46 +1,37 @@
 {
   "__chrome|edge|opera__manifest_version": 3,
   "__firefox__manifest_version": 2,
-
   "name": "Sentry Cookie Sync",
   "version": "0.0.0",
-
   "icons": {
     "128": "assets/icons/favicon-32.png"
   },
   "description": "Sync cookies for sentry local frontend development. On Github: getsentry/hackweek-cookie-sync",
   "homepage_url": "https://github.com/getsentry/hackweek-cookie-sync",
   "short_name": "Cookie Sync",
-
   "permissions": [
     "activeTab",
     "cookies",
     "storage",
     "tabs"
   ],
-
   "__chrome|edge|opera__host_permissions": [
     "https://*.sentry.dev/*",
     "https://dev.getsentry.net/*",
     "https://sentry.io/*"
   ],
-
   "__firefox__content_security_policy": "script-src 'self'; object-src 'self'",
   "__chrome|edge|opera__content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
-
   "author": "Ryan Albrecht",
-
   "__firefox__applications": {
     "gecko": {
       "id": "{f7fe2556-f3c9-4167-a98e-671faacf82cf}"
     }
   },
-
   "__chrome__minimum_chrome_version": "49",
   "__opera__minimum_opera_version": "36",
-
   "__firefox__browser_action": {
     "default_popup": "popup.html",
     "default_title": "Sentry Cookie Sync",
@@ -50,21 +41,21 @@
     "default_popup": "popup.html",
     "default_title": "Sentry Cookie Sync"
   },
-
   "background": {
     "__firefox__scripts": [
       "js/background.bundle.js"
     ],
     "__chrome|edge|opera__service_worker": "js/serviceworker.bundle.js"
   },
-
-  "content_scripts": [{
-    "matches": [
-      "https://*.sentry.dev/auth/login/",
-      "https://dev.getsentry.net/auth/login/"
-    ],
-    "js": [
-      "js/contentScript.bundle.js"
-    ]
-  }]
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.sentry.dev/auth/login/",
+        "https://dev.getsentry.net/auth/login/"
+      ],
+      "js": [
+        "js/contentScript.bundle.js"
+      ]
+    }
+  ]
 }
