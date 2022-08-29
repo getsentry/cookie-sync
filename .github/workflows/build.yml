@@ -16,22 +16,42 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-    - name: Build with Node v${{ env.node-version }}
+
+    - name: Run `yarn install` on Node v${{ env.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ env.node-version }}
         cache: 'yarn'
     - run: yarn install --frozen-lockfile
-    - run: yarn run build
+
+    - name: Fetch next version
+      uses: mathieudutour/github-tag-action@v6.0
+      id: find_version
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        release_branches: main
+        dry_run: true
+
+    - name: Set version to ${{ steps.find_version.outputs.new_tag }}
+      run: >
+        echo 'Bumping version to "${{ steps.find_version.outputs.new_tag }}"';
+        cp package.json tmp.json;
+        jq -r '.version |= "${{ steps.find_version.outputs.new_tag }}"' tmp.json > package.json;
+        cp source/manifest.json tmp.json;
+        jq -r '.version |= "${{ steps.find_version.outputs.new_tag }}"' tmp.json > source/manifest.json;
+        rm -rf tmp.json
+
+    - name: Run `yarn build`
+      run: yarn run build
 
     - name: Bump version and push tag
-      id: tag_version
       uses: mathieudutour/github-tag-action@v6.0
+      id: tag_version
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         release_branches: main
 
-    - name: Create a GitHub release
+    - name: Create GitHub release
       uses: ncipollo/release-action@v1
       with:
         tag: ${{ steps.tag_version.outputs.new_tag }}
