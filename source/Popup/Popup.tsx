@@ -3,6 +3,7 @@ import * as React from 'react';
 import FailedIcon from '../icons/FailedIcon';
 import SuccessIcon from '../icons/SuccessIcon';
 import useSyncNow from '../useSyncNow';
+import VersionBadge from './VersionBadge';
 
 import './popup.css';
 
@@ -47,8 +48,10 @@ const Popup = () => {
             )
           : null}
       </div>
+      <VersionBadge />
     </section>
   );
 };
+
 
 export default Popup;
