@@ -35,13 +35,13 @@ jobs:
     - name: Set package.json version to ${{ steps.find_version.outputs.new_tag }}
       run: >
         cp package.json tmp.json;
-        jq -r '.version |= "${{ steps.find_version.outputs.new_tag }}"' tmp.json > package.json;
+        jq -r '.version |= "${{ steps.find_version.outputs.new_version }}"' tmp.json > package.json;
         rm -rf tmp.json
 
     - name: Set manifest.json version to ${{ steps.find_version.outputs.new_tag }}
       run: >
         cp source/manifest.json tmp.json;
-        jq -r '.version |= "${{ steps.find_version.outputs.new_tag }}"' tmp.json > source/manifest.json;
+        jq -r '.version |= "${{ steps.find_version.outputs.new_version }}"' tmp.json > source/manifest.json;
         rm -rf tmp.json
 
     - name: Run `yarn build`
