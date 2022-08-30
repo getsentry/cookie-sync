@@ -3,7 +3,6 @@ import * as React from 'react';
 import FailedIcon from '../icons/FailedIcon';
 import SuccessIcon from '../icons/SuccessIcon';
 import useSyncNow from '../useSyncNow';
-import VersionBadge from './VersionBadge';
 
 import './popup.css';
 
@@ -13,13 +12,8 @@ const Popup = () => {
   return (
     <section id="popup">
       <h1>Cookie Sync</h1>
-      <div style={{ textAlign: "center" }}>
-        <button
-          type="button"
-          className="sync-button"
-          onClick={syncNow}
-          disabled={isLoading}
-        >
+      <div style={{ textAlign: 'center' }}>
+        <button type="button" className="sync-button" onClick={syncNow} disabled={isLoading}>
           Sync Cookies Now
         </button>
       </div>
@@ -34,7 +28,7 @@ const Popup = () => {
       <div className="result">
         {results?.length
           ? results.map((promiseResult, index) =>
-              promiseResult.status === "fulfilled" ? (
+              promiseResult.status === 'fulfilled' ? (
                 <div key={index} className="success-row">
                   <SuccessIcon width={20} height={20} />
                   <div>{decodeURI(promiseResult.value.domain)}</div>
@@ -48,10 +42,8 @@ const Popup = () => {
             )
           : null}
       </div>
-      <VersionBadge />
     </section>
   );
 };
-
 
 export default Popup;

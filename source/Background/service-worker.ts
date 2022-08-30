@@ -95,32 +95,6 @@ async function getTargetUrls(): Promise<string[]> {
 }
 
 /**
- * When a cookie is updated (logging in or out of sentry.io) we should automatically
- * propagate that into all our targets.
- * 
- * @param changeInfo 
- */
-async function onCookieChanged(changeInfo: Cookies.OnChangedChangeInfoType): Promise<void> {
-  if (!await checkAuthStatus()) {
-    console.info('Logged out of sentry.io');
-    return;
-  }
-
-  const {cookie} = changeInfo;  
-  const urls = await getTargetUrls();
-
-  settingsCache.cookieNames.forEach(async cookieName => {;
-    if (cookie.domain === settingsCache.sourceUrl.host && cookie.name === cookieName) {
-      try {      
-        await Promise.all(urls.map(url => setTargetCookie(url, changeInfo.cookie)));
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  });
-}
-
-/**
  * When we get the sync-now command, we should propogate all the cookies into
  * all our targets.
  * 
@@ -146,8 +120,6 @@ async function onSyncNow(): Promise<Error | PromiseSettledResult<Cookies.Cookie>
  * Service-worker entrypoint.
  */
 (function init() {
-  browser.cookies.onChanged.addListener(onCookieChanged);
-  
   browser.runtime.onMessage.addListener(async (request: Record<string, string>) => {
     if (request.command === "sync-now") {
       console.info('Received "sync-now" command');
