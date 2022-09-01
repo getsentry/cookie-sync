@@ -10,7 +10,11 @@ type State = {
 };
 
 const settingsCache: State = {
-  cookieNames: ['session', 'su'],
+  cookieNames: [
+    'session', // Normal session cookie, you'll have this whether logged in or out
+    'su', // SUPERUSER_COOKIE_NAME
+    'sc', // CSRF_COOKIE_NAME
+  ],
   sourceUrl: new URL('https://sentry.io'),
   targetUrls: [
     new URL('https://dev.getsentry.net'),
