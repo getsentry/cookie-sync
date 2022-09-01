@@ -5,13 +5,13 @@ your sentry devapp and vercel sandboxes.
 
 ## 🚀 Installation
 
-You can download the bundled extension for your browser from the github releases page [here](https://github.com/getsentry/hackweek-cookie-sync/releases/tag/latest).
+You can download the bundled extension for your browser from the github releases page [here](https://github.com/getsentry/hackweek-cookie-sync/releases).
 
 _NOTE: This plugin will not auto-update_
 
 - ### Chromium Based Browsers (Chrome, Edge, Opera)
 
-    1. Visit: [chrome://extensions](chrome://extensions) or [edge://extensions](edge://extensions) or [about://extensions](about://extensions) (in opera).
+    1. Visit: `[chrome://extensions](chrome://extensions)` or `[edge://extensions](edge://extensions)` or `[about://extensions](about://extensions)` (in opera).
     2. Enable `Developer Mode`. Toggle is in the top-right corner (Chrome, Opera) or left sidebar (Edge)
         1. If you just enabled developer mode refresh the page.
     3. Drag & drop the `.zip` file you downloaded into the page.
@@ -76,7 +76,7 @@ Then run the following:
 
 Note: By default the `manifest.json` is set with version `0.0.0`. The webpack loader will update the version in the build with that of the `package.json` version. In order to release a new version, update version in `package.json` and run script.
 
-If you don't want to use `package.json` version, you can disable the option by changing `usePackageJSONVersion` inside [webpack.config.js](https://github.com/getsentry/hackweek-cookie-sync/blob/main/webpack.config.js#L86).
+If you don't want to use `package.json` version, you can disable the option by changing `usePackageJSONVersion` inside [webpack.config.js](https://github.com/getsentry/hackweek-cookie-sync/blob/main/webpack.config.js#L82).
 
 ### Generating browser specific manifest.json
 
