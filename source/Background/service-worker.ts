@@ -19,6 +19,7 @@ const settingsCache: State = {
   targetUrls: [
     new URL('https://dev.getsentry.net'),
     new URL('https://*.sentry.dev'),
+    new URL('https://new.staging.getsentry.net'),
   ],
 };
 
