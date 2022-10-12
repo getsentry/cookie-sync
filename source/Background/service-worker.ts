@@ -16,8 +16,8 @@ const settingsCache: State = {
     'su', // SUPERUSER_COOKIE_NAME
     'sentry-sc', // CSRF_COOKIE_NAME
     'sc', // CSRF_COOKIE_NAME
-    'sentry-sudo', // SUDO_COOKIE_DOMAIN
-    'sudo', // SUDO_COOKIE_DOMAIN
+    'sentry-sudo', // SUDO_COOKIE_NAME
+    'sudo', // SUDO_COOKIE_NAME
   ],
   sourceUrl: new URL('https://sentry.io'),
   targetUrls: [
