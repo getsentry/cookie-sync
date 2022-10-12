@@ -10,11 +10,12 @@ type State = {
 };
 
 const settingsCache: State = {
-  cookieNames: ['session', 'su'],
+  cookieNames: ['session', 'sentry-su', 'sentry-sc'],
   sourceUrl: new URL('https://sentry.io'),
   targetUrls: [
     new URL('https://dev.getsentry.net'),
     new URL('https://*.sentry.dev'),
+    new URL('https://new.staging.getsentry.net'),
   ],
 };
 
@@ -34,7 +35,7 @@ async function fetchSourceCookies(): Promise<Cookies.Cookie[]> {
 /**
  * Set a Cookie against the target domain.
  * 
- * @param target Domain where the Cookie should be saved
+ * @param targetDomain Domain where the Cookie should be saved
  * @param cookie Original Cookie to be copied
  * @returns The saved Cookie
  */
