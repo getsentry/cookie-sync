@@ -124,7 +124,6 @@ async function onSyncNow(): Promise<Error | PromiseSettledResult<Cookies.Cookie>
  * Service-worker entrypoint.
  */
 (function init() {
-  // browser.cookies.onChanged.addListener(onCookieChanged);
   
   browser.runtime.onMessage.addListener(async (request: Record<string, string>) => {
     if (request.command === "sync-now") {
