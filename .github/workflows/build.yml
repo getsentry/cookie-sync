@@ -25,7 +25,7 @@ jobs:
     - run: yarn install --frozen-lockfile
 
     - name: Fetch next version
-      uses: mathieudutour/github-tag-action@v6.0
+      uses: mathieudutour/github-tag-action@v6.1
       id: find_version
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
