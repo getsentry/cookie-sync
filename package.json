@@ -1,6 +1,6 @@
 {
   "name": "cookie-sync",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Web extension starter using react and typescript",
   "private": true,
   "repository": "https://github.com/getsentry/hackweek-cookie-sync.git",
@@ -31,6 +31,9 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.18.9",
+    "@sentry/browser": "^7.39.0",
+    "@sentry/react": "^7.39.0",
+    "@sentry/tracing": "^7.39.0",
     "advanced-css-reset": "^1.2.2",
     "emoji-log": "^1.0.2",
     "react": "^17.0.2",

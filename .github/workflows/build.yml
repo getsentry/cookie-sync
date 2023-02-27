@@ -61,3 +61,14 @@ jobs:
         name: Release ${{ steps.tag_version.outputs.new_tag }}
         body: ${{ steps.tag_version.outputs.changelog }}
         artifacts: extension/chrome.zip, extension/edge.zip, extension/opera.zip, extension/firefox.xpi
+
+    - name: Sentry Release
+      uses: getsentry/action-release@v1.3.0
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+        SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        # SENTRY_URL: https://sentry.io/
+      with:
+        environment: production
+        version: ${{ steps.tag_version.outputs.new_tag }}
