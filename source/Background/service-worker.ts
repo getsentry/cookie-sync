@@ -185,6 +185,7 @@ function debugResults(event: string, results: PromiseSettledResult<{
  */
 (async function init() {
   console.clear();
+  Storage.clear();
   console.info('Cookie Sync Service Worker is starting...');
 
   browser.cookies.onChanged.addListener(onCookieChanged);

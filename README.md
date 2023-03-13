@@ -3,6 +3,8 @@
 A browser pluging to help copy cookies from sentry.io so you can be logged-in to 
 your sentry devapp and vercel sandboxes.
 
+![](./source/assets/example.png)
+
 ## 🚀 Installation
 
 You can download the bundled extension for your browser from the github releases page [here](https://github.com/getsentry/hackweek-cookie-sync/releases).
