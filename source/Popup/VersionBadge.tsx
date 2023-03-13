@@ -25,7 +25,7 @@ function useReleasedVersions({ currentVersion }: { currentVersion: string }) {
     );
     setReleases({
       status: response.status,
-      data: await response.json(),
+      data: await response.json() as any,
     });
   };
 

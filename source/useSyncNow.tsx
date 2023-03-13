@@ -1,9 +1,11 @@
 import * as React from "react";
-import browser, {Cookies} from "webextension-polyfill";
+import browser from "webextension-polyfill";
+
+import type {Message, SyncNowResponse} from "./types";
 
 type State = {
   isLoading: boolean;
-  results: undefined | PromiseSettledResult<Cookies.Cookie>[];
+  results: undefined | SyncNowResponse;
   error: undefined | Error;
 };
 
@@ -15,6 +17,11 @@ export default function useSyncNow() {
   });
 
   const syncNow = React.useCallback(async () => {
+    const setAndReturnState = (s: State) => {
+      setState(s);
+      return s;
+    };
+
     setState({
       isLoading: true,
       error: undefined,
@@ -24,42 +31,19 @@ export default function useSyncNow() {
     try {
       const results = (await browser.runtime.sendMessage({
         command: "sync-now",
-      })) as Error | PromiseSettledResult<Cookies.Cookie>[];
+      } as Message)) as SyncNowResponse;
 
-      if (results instanceof Error) {
-        setState({
-          isLoading: false,
-          results: undefined,
-          error: results,
-        });
-        return {
-          isLoading: false,
-          results: undefined,
-          error: results,
-        };
-      }
-
-      setState({
+      return setAndReturnState({
         isLoading: false,
         results: results,
         error: undefined,
       });
-      return {
-        isLoading: false,
-        results: results,
-        error: undefined,
-      };
     } catch (err: unknown) {
-      setState({
+      return setAndReturnState({
         isLoading: false,
         results: undefined,
         error: err as Error,
       });
-      return {
-        isLoading: false,
-        results: undefined,
-        error: err as Error,
-      };
     }
   }, []);
 

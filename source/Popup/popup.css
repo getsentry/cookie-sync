@@ -6,8 +6,12 @@ body {
   background-color: var(--surface100);
 }
 
+input[disabled] {
+  color: white;
+}
+
 #popup {
-  min-width: 350px;
+  min-width: 450px;
   padding: 20px 20px;
 }
 
@@ -35,7 +39,7 @@ h1 {
   padding-bottom: 8px;
   box-shadow: 0 1px 4px rgb(10 8 12 / 20%);
   cursor: pointer;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .result {
@@ -52,9 +56,11 @@ h1 {
 
 .success-row {
   color: var(--green400);
-  display: flex;
-  gap: 8px;
   align-items: center;
+}
+.success-row a,
+.success-row a:visited {
+  color: var(--green400);
 }
 
 .error-row {

@@ -1,6 +1,7 @@
 import { BrowserTracing } from "@sentry/tracing";
 import * as React from 'react';
 import * as Sentry from "@sentry/react";
+import ErrorBoundary from "./ErrorBoundary";
 import packageJSON from "../../package.json";
 import Popup from "./Popup";
 import ReactDOM from 'react-dom';
@@ -15,4 +16,9 @@ Sentry.init({
   tracesSampleRate: 1.0,
 });
 
-ReactDOM.render(<Popup />, document.getElementById("popup-root"));
+ReactDOM.render(
+  <ErrorBoundary>
+    <Popup />
+  </ErrorBoundary>,
+  document.getElementById("popup-root")
+);
