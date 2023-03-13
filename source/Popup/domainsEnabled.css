@@ -1,0 +1,14 @@
+.domainsEnabled-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 10px;
+}
+
+.domainsEnabled-grid h2 {
+  font-weight: bold;
+}
+
+.domainsEnabled-grid label {
+  display: flex;
+  gap: 6px;
+}

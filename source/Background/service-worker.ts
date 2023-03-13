@@ -1,141 +1,199 @@
-import browser, {Cookies} from 'webextension-polyfill';
+import browser, {Cookies, Tabs} from 'webextension-polyfill';
 
-console.clear();
-console.info('Cookie Sync Service Worker is starting...');
+import {
+  extractDomain,
+  extractOrgSlug,
+  isProdDomain,
+  isProdOrigin,
+  orgSlugToOrigin,
+} from './domains';
+import {
+  findOpenDevUITabs,
+  findOpenProdTabs,
+  tabsToOrigins,
+} from './tabs';
+import {
+  getCookiesByOrigin,
+  isKnownCookie,
+  setTargetCookie,
+} from './cookies';
+import Storage from './storage';
+import toUrl from '../utils/toUrl';
+import uniq from '../utils/uniq';
+import uniqBy from '../utils/uniqBy';
 
-type State = {
-  cookieNames: string[];
-  sourceUrl: URL;
-  targetUrls: URL[];
-};
-
-const settingsCache: State = {
-  cookieNames: [
-    'session', // Normal session cookie, you'll have this whether logged in or out
-    'sentry-su', // SUPERUSER_COOKIE_NAME
-    'su', // SUPERUSER_COOKIE_NAME
-    'sentry-sc', // CSRF_COOKIE_NAME
-    'sc', // CSRF_COOKIE_NAME
-    'sentry-sudo', // SUDO_COOKIE_NAME
-    'sudo', // SUDO_COOKIE_NAME
-  ],
-  sourceUrl: new URL('https://sentry.io'),
-  targetUrls: [
-    new URL('https://*.sentry.dev'),
-    new URL('https://dev.getsentry.net'),
-    new URL('https://new.staging.getsentry.net'),
-  ],
-};
+import type {Message, StorageClearResponse, SyncNowResponse} from '../types';
 
 /**
- * Read the source cookies from the source domain.
- *
- * @returns Array of Cookie values to be copied
+ * Look at a list of our open tabs and save a list of found org-slugs for later.
  */
-async function fetchSourceCookies(): Promise<Cookies.Cookie[]> {
-  const cookies = await Promise.all(settingsCache.cookieNames.map((name) => browser.cookies.get({
-    name,
-    url: settingsCache.sourceUrl.href,
-  })));
-  return cookies.filter(Boolean);
+async function saveFoundOrgs(origins: string[]) {
+  const orgSlugs = origins
+    .map(extractOrgSlug)
+    .filter(Boolean);
+
+  await Storage.saveOrg(uniq(orgSlugs));
 }
 
 /**
- * Set a Cookie against the target domain.
- *
- * @param target Domain where the Cookie should be saved
- * @param cookie Original Cookie to be copied
- * @returns The saved Cookie
+ * Look at a list of open `*.sentry.io` tabs, grab the cookies from them and
+ * save them for later.
  */
-async function setTargetCookie(targetDomain: string, cookie: Cookies.Cookie): Promise<Cookies.Cookie> {
-  const details = {
-    url: targetDomain,
-    expirationDate: cookie.expirationDate,
-    httpOnly: cookie.httpOnly,
-    name: cookie.name,
-    sameSite: cookie.sameSite,
-    secure: cookie.secure,
-    value: cookie.value,
-  };
-  return browser.cookies.set(details);
+async function saveProdCookies(prodOrigins: string[]) {
+  // The cookies are the same on `foo.sentry.io` and `bar.sentry.io`, they're
+  // set against `.sentry.io`. So we only need to ask for each unique host.
+  const origins = uniqBy(prodOrigins, extractDomain);
+  const prodCookiesByOrigin = await getCookiesByOrigin(origins);
+
+  // Insert those cookies into storage so we can use them even if the prod tabs
+  // get closed and we can't read them fresh again.
+  const cookieCache = await Storage.getCookieCache();
+  Array.from(prodCookiesByOrigin.entries()).flatMap(([origin, cookies]) => 
+    cookies.map((cookie) => cookieCache.insert(extractDomain(origin) || origin, cookie))
+  );
+  await cookieCache.save();
 }
 
 /**
- * Check to see if we're already logged in to sentry.io.
- *
- * If we're not logged in (or sentry is down) then we should show a message
- * because cloning the cookie won't do much good.
- *
- * @returns Promise<boolean>
+ * Read open tabs and save the orgs and cookies that we find
  */
-async function checkAuthStatus(): Promise<boolean> {
-  const response = await fetch('https://sentry.io/api/0/internal/health/');
-  return response.ok;
+async function findAndCacheData() {
+    const [openDevTabs, openProdTabs] = await Promise.all([
+    findOpenDevUITabs(),
+    findOpenProdTabs(),
+  ]);
+
+  await Promise.all([
+    saveFoundOrgs(tabsToOrigins([...openDevTabs, ...openProdTabs])),
+    saveProdCookies(tabsToOrigins(openProdTabs)),
+  ]);
 }
 
-/**
- * Combine static target urls from the settings with any open tabs that match
- * wildcard targets.
- *
- * We can't know all the `.sentry.net` subdomains before hand, but if you have
- * a tab open then we can read that subdomain and set a cookie onto it.
- * @returns Promise<string[]>
- */
-async function getTargetUrls(): Promise<string[]> {
-  const targetOrigins = settingsCache.targetUrls.map(url => decodeURI(url.origin))
+async function setCookiesOnKnownOrgs() {
+  const [knownOrgSlugs, domains, cookieCache] = await Promise.all([
+    Storage.getOrgs(),
+    Storage.getDomains(),
+    Storage.getCookieCache(),
+  ]);
 
-  const staticTargets = targetOrigins
-    .filter(origin => !origin.includes('*'))
-    .map(origin => `${origin}/`);
+  const cookieList = cookieCache.toArray();
+  const targetOrigins = knownOrgSlugs.flatMap(orgSlug => 
+    domains
+      .filter(domain => domain.syncEnabled)
+      .map(domain => orgSlugToOrigin(orgSlug, domain.domain))
+  );
 
-  const wildcardTargets = targetOrigins
-    .filter(origin => origin.includes('*'))
-    .map(origin => `${origin}/*`);
-
-  const tabsMatchingWildcards = await browser.tabs.query({url: wildcardTargets});
-  const tabTargets = tabsMatchingWildcards
-    .map(tab => new URL(tab.url || '').origin)
-    .map(origin => `${origin}/`);
-
-  return Array.from(new Set([
-    ...staticTargets,
-    ...tabTargets
-  ]));
-}
-
-/**
- * When we get the sync-now command, we should propogate all the cookies into
- * all our targets.
- *
- * @returns List of the results of setting each Cookie, or Error
- */
-async function onSyncNow(): Promise<Error | PromiseSettledResult<Cookies.Cookie>[]> {
-  if (!await checkAuthStatus()) {
-    console.info('Logged out of sentry.io');
-    return new Error('You are logged out of Sentry.io.')
-  }
-
-  const [urls, cookies] = await Promise.all([getTargetUrls(), fetchSourceCookies()]);
-  const results = await Promise.allSettled(
-    urls.flatMap(url =>
-      cookies.map(cookie => setTargetCookie(url, cookie))
+  const results = Promise.allSettled(
+    targetOrigins.flatMap((origin) =>
+      cookieList.map(async ({cookie}) => 
+        await setTargetCookie(origin, extractDomain(origin)!, cookie)
+      )
     )
   );
-  console.info('Sync complete', results);
   return results;
+}
+
+/**
+ * When a cookie is updated (logging in or out of sentry.io) we should automatically
+ * propagate that into all our targets.
+ *
+ * @param changeInfo
+ */
+async function onCookieChanged(changeInfo: Cookies.OnChangedChangeInfoType): Promise<void> {
+  const {cookie} = changeInfo;
+  if (!isProdDomain(cookie.domain) || !isKnownCookie(cookie.name)) {
+    return;
+  }
+  console.group('Received onCookieChanged', {changeInfo});
+
+  const cookieCache = await Storage.getCookieCache();
+  cookieCache.insert(cookie.domain, cookie);
+  await cookieCache.save();
+
+  const results = await setCookiesOnKnownOrgs();
+  debugResults('Cookie did update', results);
+  console.groupEnd();
+}
+
+async function onTabUpdated(
+  _tabId: number,
+  changeInfo: Tabs.OnUpdatedChangeInfoType,
+  tab: Tabs.Tab
+): Promise<void> {
+  const origin = toUrl(tab.url)?.origin;
+  if (!origin || !isProdOrigin(origin)) {
+    return;
+  }
+  console.group('Received onTabUpdated', {changeInfo});
+
+  const origins = tabsToOrigins([tab]);
+  await Promise.all([
+    saveFoundOrgs(origins),
+    saveProdCookies(origins),
+  ]);
+
+  const results = await setCookiesOnKnownOrgs();
+  debugResults('Tab did update', results);
+  console.groupEnd();
+}
+
+/**
+ * When we get a message from the browser, read out the command, exec it and return the result
+ */
+async function onMessage(request: Message): Promise<SyncNowResponse | StorageClearResponse | false> {
+  if (!request.command) {
+    return false;
+  }
+  console.group(`Received "${request.command}" command`);
+  switch(request.command) {
+    case 'sync-now': {
+      await findAndCacheData();
+      const results = await setCookiesOnKnownOrgs();
+      debugResults('Sync complete', results);
+      console.groupEnd();
+      return results;
+    }
+    case 'storage-clear':
+      await Storage.clear();
+      console.groupEnd();
+      return true;
+    default:
+      console.groupEnd();
+      return false;
+  }
+}
+
+function debugResults(event: string, results: PromiseSettledResult<{
+    origin: string;
+    cookie: browser.Cookies.Cookie;
+}>[]) {
+  console.log(event);
+  console.table(
+    results.map((result) => {
+      const value = result.status === 'fulfilled' ? result.value : result;
+      return ({
+        status: result.status,
+        reason: null,
+        ...value,
+      });
+    })
+  );
 }
 
 /**
  * Service-worker entrypoint.
  */
-(function init() {
-  browser.runtime.onMessage.addListener(async (request: Record<string, string>) => {
-    if (request.command === "sync-now") {
-      console.info('Received "sync-now" command');
-      return await onSyncNow();
-    }
-    return false;
-  });
+(async function init() {
+  console.clear();
+  console.info('Cookie Sync Service Worker is starting...');
+
+  browser.cookies.onChanged.addListener(onCookieChanged);
+  browser.tabs.onUpdated.addListener(onTabUpdated);
+  browser.runtime.onMessage.addListener(onMessage);
+
+  await onMessage({command: 'sync-now'});
+
+  await Storage.debug();
 })();
 
 export {};
