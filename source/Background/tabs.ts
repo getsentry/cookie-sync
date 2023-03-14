@@ -37,8 +37,9 @@ async function isDevUi(tab: Tabs.Tab) {
 
 export async function findOpenDevUITabs() {
   const tabs = await findOpenTabsMatching([
+    'https://*.dev.getsentry.net:7999/*',
+    'https://*.localhost:7999/*',
     'https://*.sentry.dev/*',
-    'https://*.dev.getsentry.net/*',
   ]);
 
   return tabs.filter(isDevUi);

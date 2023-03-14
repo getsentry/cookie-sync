@@ -52,8 +52,8 @@
     {
       "matches": [
         "https://*.sentry.dev/auth/login/",
-        "https://dev.getsentry.net/auth/login/",
-        "https://*.dev.getsentry.net/auth/login/",
+        "https://dev.getsentry.net:7999/auth/login/",
+        "https://*.dev.getsentry.net:7999/auth/login/",
         "https://new.staging.getsentry.net/auth/login"
       ],
       "js": [
