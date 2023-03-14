@@ -22,7 +22,7 @@ type StorageFields = {
 const DEFAULT_ORGS: ReadonlyArray<string> = [];
 const DEFAULT_DOMAINS: ReadonlyArray<Domain> = [
   {domain: 'dev.getsentry.net:7999', syncEnabled: true},
-  {domain: 'localhost', syncEnabled: false},
+  {domain: 'localhost:7999', syncEnabled: false},
   {domain: 'sentry.dev', syncEnabled: true},
 ];
 
