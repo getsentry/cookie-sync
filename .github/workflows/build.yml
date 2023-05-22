@@ -62,6 +62,14 @@ jobs:
         body: ${{ steps.tag_version.outputs.changelog }}
         artifacts: extension/chrome.zip, extension/edge.zip, extension/opera.zip, extension/firefox.xpi
 
+    - name: Submit to Google
+      run: npx chrome-webstore-upload-cli@2 upload --auto-publish --source extension/chrome.zip
+      env:
+        EXTENSION_ID: ${{ secrets.EXTENSION_ID }}
+        CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+        CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+        REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+
     - name: Sentry Release
       uses: getsentry/action-release@v1.3.0
       env:
