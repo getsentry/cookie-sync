@@ -10,7 +10,6 @@
   "homepage_url": "https://github.com/getsentry/hackweek-cookie-sync",
   "short_name": "Cookie Sync",
   "permissions": [
-    "activeTab",
     "cookies",
     "storage",
     "tabs"
@@ -31,7 +30,7 @@
       "id": "{f7fe2556-f3c9-4167-a98e-671faacf82cf}"
     }
   },
-  "__chrome__minimum_chrome_version": "49",
+  "__chrome__minimum_chrome_version": "88",
   "__opera__minimum_opera_version": "36",
   "__firefox__browser_action": {
     "default_popup": "popup.html",
