@@ -7,7 +7,7 @@ your sentry devapp and vercel sandboxes.
 
 ## 🚀 Installation
 
-You can download the bundled extension for your browser from the github releases page [here](https://github.com/getsentry/hackweek-cookie-sync/releases).
+You can download the bundled extension for your browser from the github releases page [here](https://github.com/getsentry/cookie-sync/releases).
 
 _NOTE: This plugin will not auto-update_
 
@@ -78,7 +78,7 @@ Then run the following:
 
 Note: By default the `manifest.json` is set with version `0.0.0`. The webpack loader will update the version in the build with that of the `package.json` version. In order to release a new version, update version in `package.json` and run script.
 
-If you don't want to use `package.json` version, you can disable the option by changing `usePackageJSONVersion` inside [webpack.config.js](https://github.com/getsentry/hackweek-cookie-sync/blob/main/webpack.config.js#L82).
+If you don't want to use `package.json` version, you can disable the option by changing `usePackageJSONVersion` inside [webpack.config.js](https://github.com/getsentry/cookie-sync/blob/main/webpack.config.js#L82).
 
 ### Generating browser specific manifest.json
 
@@ -123,8 +123,8 @@ See the original [README](https://github.com/abhijithvijayan/wext-manifest-loade
 
 ## Bugs
 
-Please file an issue [here](https://github.com/getsentry/hackweek-cookie-sync/issues) for feature requests, bugs, missing documentation, or unexpected behavior.
+Please file an issue [here](https://github.com/getsentry/cookie-sync/issues) for feature requests, bugs, missing documentation, or unexpected behavior.
 
 ## License
 
-[MIT ©](https://github.com/getsentry/hackweek-cookie-sync/blob/main/LICENCE)
+[MIT ©](https://github.com/getsentry/cookie-sync/blob/main/LICENCE)
