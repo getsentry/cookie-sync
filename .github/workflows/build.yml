@@ -62,6 +62,16 @@ jobs:
         body: ${{ steps.tag_version.outputs.changelog }}
         artifacts: extension/chrome.zip, extension/edge.zip, extension/opera.zip, extension/firefox.xpi
 
+    - name: Upload To Chrome Webstore
+      uses: mnao305/chrome-extension-upload@v4.0.1
+      with:
+        file-path: extension/chrome.zip
+        extension-id: ojbolbbmkndcafmblpelfdhkggpmdhnm
+        client-id: ${{ secrets.CHROME_CLIENT_ID }}
+        client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
+        refresh-token: ${{ secrets.CHROME_REFRESH_TOKEN }}
+        publish: false
+
     - name: Sentry Release
       uses: getsentry/action-release@v1.3.0
       env:
