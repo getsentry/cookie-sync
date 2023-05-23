@@ -14,71 +14,99 @@ jobs:
       node-version: 19.x # See Node.js release schedule: https://nodejs.org/en/about/releases/
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Setup Node v${{ env.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ env.node-version }}
-        cache: 'yarn'
-    
-    - run: yarn install --frozen-lockfile
+      - name: Setup Node v${{ env.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.node-version }}
+          cache: 'yarn'
+      
+      - run: yarn install --frozen-lockfile
 
-    - name: Fetch next version
-      uses: mathieudutour/github-tag-action@v6.1
-      id: find_version
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        release_branches: main
-        dry_run: true
+      - name: Fetch next version
+        uses: mathieudutour/github-tag-action@v6.1
+        id: find_version
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          release_branches: main
+          dry_run: true
 
-    - name: Set package.json version to ${{ steps.find_version.outputs.new_tag }}
-      run: >
-        cp package.json tmp.json;
-        jq -r '.version |= "${{ steps.find_version.outputs.new_version }}"' tmp.json > package.json;
-        rm -rf tmp.json
+      - name: Set package.json version to ${{ steps.find_version.outputs.new_tag }}
+        run: >
+          cp package.json tmp.json;
+          jq -r '.version |= "${{ steps.find_version.outputs.new_version }}"' tmp.json > package.json;
+          rm -rf tmp.json
 
-    - name: Set manifest.json version to ${{ steps.find_version.outputs.new_tag }}
-      run: >
-        cp source/manifest.json tmp.json;
-        jq -r '.version |= "${{ steps.find_version.outputs.new_version }}"' tmp.json > source/manifest.json;
-        rm -rf tmp.json
+      - name: Set manifest.json version to ${{ steps.find_version.outputs.new_tag }}
+        run: >
+          cp source/manifest.json tmp.json;
+          jq -r '.version |= "${{ steps.find_version.outputs.new_version }}"' tmp.json > source/manifest.json;
+          rm -rf tmp.json
 
-    - run: yarn run build
+      - run: yarn run build
 
-    - name: Bump version and push tag
-      uses: mathieudutour/github-tag-action@v6.1
-      id: tag_version
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        release_branches: main
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      node-version: 19.x # See Node.js release schedule: https://nodejs.org/en/about/releases/
 
-    - name: Create GitHub release tag ${{ steps.tag_version.outputs.new_tag }}
-      uses: ncipollo/release-action@v1
-      with:
-        tag: ${{ steps.tag_version.outputs.new_tag }}
-        name: Release ${{ steps.tag_version.outputs.new_tag }}
-        body: ${{ steps.tag_version.outputs.changelog }}
-        artifacts: extension/chrome.zip, extension/edge.zip, extension/opera.zip, extension/firefox.xpi
+    steps:
+      - name: Bump version and push tag
+        uses: mathieudutour/github-tag-action@v6.1
+        id: tag_version
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          release_branches: main
 
-    - name: Submit to Google
-      run: npx chrome-webstore-upload-cli@2 upload --auto-publish --source extension/chrome.zip --extensionId
-      env:
-        EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
-        CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
-        CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
-        REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+      - name: Create GitHub release tag ${{ steps.tag_version.outputs.new_tag }}
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          name: Release ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
+          artifacts: extension/chrome.zip, extension/edge.zip, extension/opera.zip, extension/firefox.xpi
 
-    - name: Sentry Release
-      uses: getsentry/action-release@v1.3.0
-      env:
-        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-        SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-        SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-        # SENTRY_URL: https://sentry.io/
-      with:
-        environment: production
-        version: ${{ steps.tag_version.outputs.new_tag }}
-        ignore_missing: true
-        set_commits	: skip
+  upload:
+    runs-on: ubuntu-latest
+    env:
+      node-version: 19.x # See Node.js release schedule: https://nodejs.org/en/about/releases/
+
+    strategy:
+      fail-fast: false
+      matrix:
+        command:
+          - chrome
+          - firefox
+          - sentry
+    steps:
+      - name: Submit to Google
+        if: matrix.command == 'chrome'
+        run: npx chrome-webstore-upload-cli@2 upload --auto-publish --source extension/chrome.zip --extensionId
+        env:
+          EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+
+      - name: Submit to Mozilla
+        if: matrix.command == 'firefox'
+        working-directory: artifact
+        run: npx web-ext-submit@7
+        env:
+          WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
+          WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
+
+      - name: Sentry Release
+        if: matrix.command == 'sentry'
+        uses: getsentry/action-release@v1.3.0
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          environment: production
+          version: ${{ steps.tag_version.outputs.new_tag }}
+          ignore_missing: true
+          set_commits	: skip
