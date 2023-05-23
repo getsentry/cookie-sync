@@ -7,9 +7,18 @@ your sentry devapp and vercel sandboxes.
 
 ## 🚀 Installation
 
+You can install the latest version of the Cookie Sync extension using the links below:
+
+- [Get Cookie Sync for Chrome](https://chrome.google.com/webstore/detail/sentry-cookie-sync/ojbolbbmkndcafmblpelfdhkggpmdhnm?hl=en&authuser=0)
+- [Get Cookie Sync for Firefox](https://addons.mozilla.org/en-US/firefox/addon/sentry-cookie-sync/)
+
+This is the recommended installation method.
+
+## 🔧 Manual Installation
+
 You can download the bundled extension for your browser from the github releases page [here](https://github.com/getsentry/cookie-sync/releases).
 
-_NOTE: This plugin will not auto-update_
+_NOTE: Auto-update will not work with manual installations._
 
 - ### Chromium Based Browsers (Chrome, Edge, Opera)
 
@@ -46,39 +55,30 @@ Then run the following:
 
 ### Development
 
-- `yarn install` to install dependencies.
-- To watch file changes in development
+1. `yarn install` to install dependencies.
+2. `yarn run dev:chrome` or `yarn run dev:firefox` To watch file changes in development`
 
-  - Chrome
-    - `yarn run dev:chrome`
-  - Firefox
-    - `yarn run dev:firefox`
-  - Edge
-    - `yarn run dev:edge`
-  - Opera
-    - `yarn run dev:opera`
+3. Load the extension in your browser
 
-- **Load extension in browser**
+    _NOTE: Remove any existing version of this extension, if installed_
 
-- ### Chrome
+    #### Chrome
 
-  - Go to the browser address bar and type `chrome://extensions`
-  - Check the `Developer Mode` button to enable it.
-  - Click on the `Load Unpacked Extension…` button.
-  - Select your browsers folder in `extension/`.
+    - Go to the browser address bar and type `chrome://extensions`
+    - Check the `Developer Mode` button to enable it.
+    - Click on the `Load Unpacked Extension…` button.
+    - Select your browsers folder in `extension/`.
 
-- ### Firefox
+    #### Firefox [ESR](https://www.mozilla.org/en-US/firefox/enterprise/), [Developer](https://www.mozilla.org/en-US/firefox/developer/), or [Nightly build](https://www.mozilla.org/en-US/firefox/channel/desktop/#nightly)
 
-  - Load the Add-on via `about:debugging` as temporary Add-on.
-  - Choose the `manifest.json` file in the extracted directory
+    - Load the Add-on via `about:debugging` as temporary Add-on.
+    - Choose the `manifest.json` file in the extracted directory
 
 ### Production
 
 - `yarn run build` builds the extension for all the browsers to `extension/BROWSER` directory respectively.
 
-Note: By default the `manifest.json` is set with version `0.0.0`. The webpack loader will update the version in the build with that of the `package.json` version. In order to release a new version, update version in `package.json` and run script.
-
-If you don't want to use `package.json` version, you can disable the option by changing `usePackageJSONVersion` inside [webpack.config.js](https://github.com/getsentry/cookie-sync/blob/main/webpack.config.js#L82).
+Note: By default the `package.json` and `manifest.json` are set with version `0.0.0`. The CI pipeline will set the version before building the bundles.
 
 ### Generating browser specific manifest.json
 

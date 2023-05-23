@@ -2,7 +2,7 @@
   "__chrome|edge|opera__manifest_version": 3,
   "__firefox__manifest_version": 2,
   "name": "Sentry Cookie Sync",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "icons": {
     "32": "assets/icons/favicon-32.png",
     "128": "assets/icons/favicon-128.png",
