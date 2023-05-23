@@ -4,6 +4,7 @@
 body {
   color: var(--gray500);
   background-color: var(--surface100);
+  font-family: system-ui, sans-serif;
 }
 
 input[disabled] {

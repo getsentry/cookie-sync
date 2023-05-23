@@ -9,12 +9,18 @@
   "description": "Sync cookies for sentry local frontend development. On Github: getsentry/hackweek-cookie-sync",
   "homepage_url": "https://github.com/getsentry/hackweek-cookie-sync",
   "short_name": "Cookie Sync",
-  "permissions": [
+  "__chrome|edge|opera__permissions": [
     "cookies",
     "storage",
     "tabs"
   ],
-  "__chrome|edge|opera__host_permissions": [
+  "__firefox__permissions": [
+    "cookies",
+    "storage",
+    "tabs",
+    "<all_urls>"
+  ],
+  "__chrome|edge|opera|firefox__host_permissions": [
     "https://*.sentry.io/*",
     "https://*.localhost/*",
     "https://*.sentry.dev/*",
@@ -43,7 +49,7 @@
   },
   "background": {
     "__firefox__scripts": [
-      "js/background.bundle.js"
+      "js/serviceworker.bundle.js"
     ],
     "__chrome|edge|opera__service_worker": "js/serviceworker.bundle.js"
   },
