@@ -45,6 +45,8 @@ jobs:
           jq -r '.version |= "${{ steps.find_version.outputs.new_version }}"' tmp.json > source/manifest.json;
           rm -rf tmp.json
 
+      - run: yarn run lint
+
       - run: yarn run build
 
       - uses: actions/upload-artifact@master
