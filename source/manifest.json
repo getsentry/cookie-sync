@@ -4,7 +4,10 @@
   "name": "Sentry Cookie Sync",
   "version": "0.0.1",
   "icons": {
-    "128": "assets/icons/favicon-32.png"
+    "32": "assets/icons/favicon-32.png",
+    "128": "assets/icons/favicon-128.png",
+    "180": "assets/icons/favicon-180.png",
+    "192": "assets/icons/favicon-192.png"
   },
   "description": "Sync cookies for sentry local frontend development. On Github: getsentry/hackweek-cookie-sync",
   "homepage_url": "https://github.com/getsentry/hackweek-cookie-sync",
@@ -20,7 +23,7 @@
     "tabs",
     "<all_urls>"
   ],
-  "__chrome|edge|opera|firefox__host_permissions": [
+  "__chrome|edge|opera__host_permissions": [
     "https://*.sentry.io/*",
     "https://*.localhost/*",
     "https://*.sentry.dev/*",
@@ -31,7 +34,7 @@
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
   "author": "Ryan Albrecht",
-  "__firefox__applications": {
+  "__firefox__browser_specific_settings": {
     "gecko": {
       "id": "{f7fe2556-f3c9-4167-a98e-671faacf82cf}"
     }
