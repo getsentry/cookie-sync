@@ -1,46 +1,8 @@
-import * as React from "react";
+import * as React from 'react';
 
-import FailedIcon from "../icons/FailedIcon";
+import FailedIcon from '../icons/FailedIcon';
 
 import useSyncNow from '../useSyncNow';
-
-export default function Banner() {
-  const {syncNow, error } = useSyncNow();
-
-  return (
-    <React.Fragment>
-      <Styles />
-      <div id="__sentry_cookie_sync_banner__">
-        <div>
-          <button
-            className="sync-button"
-            onClick={async () => {
-              const { results, error } = await syncNow();
-              if (!error && results?.length) {
-                const target = window.location.origin + "/";
-                window.location.href = target;
-              }
-            }}
-          >
-            Sync Cookies & Login Now
-          </button>
-        </div>
-
-        {error ? (
-          <div className="error-alert">
-            <div>
-              <FailedIcon width={24} height={24} />
-              <div>{error}</div>
-              <a target="_blank" href="https://sentry.io/auth/login/">
-                Login
-              </a>
-            </div>
-          </div>
-        ) : null}
-      </div>
-    </React.Fragment>
-  );
-}
 
 function Styles() {
   return (
@@ -112,5 +74,48 @@ function Styles() {
       }
     `}
     </style>
+  );
+}
+
+export default function Banner() {
+  const {syncNow, error} = useSyncNow();
+
+  return (
+    <React.Fragment>
+      <Styles />
+      <div id="__sentry_cookie_sync_banner__">
+        <div>
+          <button
+            type="button"
+            className="sync-button"
+            onClick={async () => {
+              const {results, error: err} = await syncNow();
+              if (!err && results?.length) {
+                const target = `${window.location.origin}/`;
+                window.location.href = target;
+              }
+            }}
+          >
+            Sync Cookies & Login Now
+          </button>
+        </div>
+
+        {error ? (
+          <div className="error-alert">
+            <div>
+              <FailedIcon width={24} height={24} />
+              <div>{error}</div>
+              <a
+                target="_blank"
+                href="https://sentry.io/auth/login/"
+                rel="noreferrer"
+              >
+                Login
+              </a>
+            </div>
+          </div>
+        ) : null}
+      </div>
+    </React.Fragment>
   );
 }

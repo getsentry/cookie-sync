@@ -1,14 +1,14 @@
 import * as React from 'react';
-import { serializeError } from 'serialize-error';
+import {serializeError} from 'serialize-error';
 
 import SuccessIcon from '../icons/SuccessIcon';
 import FailedIcon from '../icons/FailedIcon';
 import uniq from '../utils/uniq';
 import uniqBy from '../utils/uniqBy';
 
-import type { SyncNowResponse } from '../types';
+import type {SyncNowResponse} from '../types';
 
-const ResultList = ({ results }: { results: SyncNowResponse }) => {
+const ResultList = ({results}: {results: SyncNowResponse}) => {
   const successfulCookies = Array.from(
     new Set(
       results.map((promiseResult) =>
@@ -17,8 +17,11 @@ const ResultList = ({ results }: { results: SyncNowResponse }) => {
     )
   ).filter(Boolean);
 
-  const cookies = uniqBy(successfulCookies.map(cookie => cookie.cookie), (cookie) => cookie.name);
-  const origins = uniq(successfulCookies.map(cookie => cookie.origin));
+  const cookies = uniqBy(
+    successfulCookies.map((cookie) => cookie.cookie),
+    (cookie) => cookie.name
+  );
+  const origins = uniq(successfulCookies.map((cookie) => cookie.origin));
 
   return (
     <>
@@ -29,10 +32,12 @@ const ResultList = ({ results }: { results: SyncNowResponse }) => {
           </tr>
         </thead>
         <tbody>
-          {cookies.map((cookie, index) => (
-            <tr key={index}>
+          {cookies.map((cookie) => (
+            <tr key={cookie.name}>
               <td>{cookie.name}</td>
-              <td><input disabled value={cookie.value} style={{width: '100%'}} /></td>
+              <td>
+                <input disabled value={cookie.value} style={{width: '100%'}} />
+              </td>
             </tr>
           ))}
         </tbody>
@@ -46,23 +51,25 @@ const ResultList = ({ results }: { results: SyncNowResponse }) => {
         <tbody>
           {results.map((promiseResult, index) =>
             promiseResult.status === 'fulfilled' ? null : (
+              /* eslint-disable-next-line react/no-array-index-key */
               <tr key={index} className="error-row">
                 <td>
                   <FailedIcon width={20} height={20} />
                 </td>
                 <td>
-                  {JSON.stringify(serializeError(promiseResult.reason)) || 'Rejected'}
+                  {JSON.stringify(serializeError(promiseResult.reason)) ||
+                    'Rejected'}
                 </td>
               </tr>
             )
           )}
-          {origins.map((origin, index) => (
-            <tr key={index} className="success-row">
+          {origins.map((origin) => (
+            <tr key={origin} className="success-row">
               <td>
                 <SuccessIcon width={20} height={20} />
               </td>
               <td>
-                <a href={origin} target="_blank">
+                <a href={origin} target="_blank" rel="noreferrer">
                   {origin}
                 </a>
               </td>

@@ -1,7 +1,7 @@
-import * as React from "react";
-import cmp from "semver-compare";
+import * as React from 'react';
+import cmp from 'semver-compare';
 
-import packageJSON from "../../package.json";
+import packageJSON from '../../package.json';
 
 enum VersionStatus {
   Unknown,
@@ -10,10 +10,12 @@ enum VersionStatus {
   Behind,
 }
 
-function useReleasedVersions({ currentVersion }: { currentVersion: string }) {
-  const [{ status, data }, setReleases] = React.useState<{
+type ReleasesResponse = {[key: string]: unknown; tag_name: string};
+
+function useReleasedVersions({currentVersion}: {currentVersion: string}) {
+  const [{status, data}, setReleases] = React.useState<{
     status: number;
-    data: undefined | {[key: string]: unknown; tag_name: string}[];
+    data: undefined | ReleasesResponse[];
   }>({
     status: 0,
     data: undefined,
@@ -21,11 +23,11 @@ function useReleasedVersions({ currentVersion }: { currentVersion: string }) {
 
   const fetchReleases = async () => {
     const response = await fetch(
-      "https://api.github.com/repos/getsentry/hackweek-cookie-sync/releases"
+      'https://api.github.com/repos/getsentry/hackweek-cookie-sync/releases'
     );
     setReleases({
       status: response.status,
-      data: await response.json() as any,
+      data: (await response.json()) as ReleasesResponse[],
     });
   };
 
@@ -34,22 +36,23 @@ function useReleasedVersions({ currentVersion }: { currentVersion: string }) {
   }, []);
 
   if (status === 0) {
-    return { status: VersionStatus.Loading };
-  } else if (status >= 200 && status < 300) {
-    const tags = data?.map((release) => release.tag_name.replace(/^v/, ""));
+    return {status: VersionStatus.Loading};
+  }
+  if (status >= 200 && status < 300) {
+    const tags = data?.map((release) => release.tag_name.replace(/^v/, ''));
     const newestRelease = tags?.sort(cmp).pop() || '0.0.0';
     return cmp(newestRelease, currentVersion) === 1
-      ? { status: VersionStatus.Behind }
-      : { status: VersionStatus.UpToDate };
-  } else if (status >= 400) {
-    return { status: VersionStatus.Behind };
-  } else {
-    return { status: VersionStatus.Unknown };
+      ? {status: VersionStatus.Behind}
+      : {status: VersionStatus.UpToDate};
   }
+  if (status >= 400) {
+    return {status: VersionStatus.Behind};
+  }
+  return {status: VersionStatus.Unknown};
 }
 
 export default function VersionBadge() {
-  const { status } = useReleasedVersions({
+  const {status} = useReleasedVersions({
     currentVersion: packageJSON.version,
   });
 
@@ -72,13 +75,14 @@ export default function VersionBadge() {
         <div className="current-version">
           <div>Your version: {packageJSON.version}</div>
           <div>
-            A{" "}
+            A{' '}
             <a
               href="https://github.com/getsentry/hackweek-cookie-sync/releases"
               target="_blank"
+              rel="noreferrer"
             >
               newer version
-            </a>{" "}
+            </a>{' '}
             is available
           </div>
         </div>

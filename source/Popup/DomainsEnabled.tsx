@@ -1,9 +1,10 @@
-import * as React from "react";
+import * as React from 'react';
 
-import Storage from "../Background/storage";
+import Storage from '../Background/storage';
 
 import './domainsEnabled.css';
 
+// eslint-disable-next-line
 type Domains = Awaited<ReturnType<typeof Storage.getDomains>>;
 
 const useDomainsEnabled = () => {
@@ -15,13 +16,13 @@ const useDomainsEnabled = () => {
 
   React.useEffect(() => {
     refreshDomains();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return {
     domains,
     refreshDomains,
   };
-}
+};
 
 const ListItem = ({
   domain,
@@ -30,7 +31,7 @@ const ListItem = ({
 }: {
   domain: Domains[number];
   disabled?: boolean;
-  refreshDomains: ReturnType<typeof useDomainsEnabled>["refreshDomains"];
+  refreshDomains: ReturnType<typeof useDomainsEnabled>['refreshDomains'];
 }) => {
   return (
     <li>

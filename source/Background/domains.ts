@@ -1,15 +1,17 @@
-const patterns = {
-  prod: [
-    /https:\/\/(?<orgSlug>.*)(?<domain>\.sentry\.io)/,
-  ],
+const PATTERNS = {
+  prod: [/https:\/\/(?<orgSlug>.*)(?<domain>\.sentry\.io)/],
   dev: [
     /http:\/\/(?<orgSlug>.*)(?<domain>\.localhost)/,
     /https:\/\/(?<orgSlug>.*)(?<domain>\.sentry\.dev)/,
     /https:\/\/(?<orgSlug>.*)(?<domain>\.dev\.getsentry\.net)/,
   ],
-}
+};
 
-function extractFromPatterns(origin: string, matchName: number | string, patterns: RegExp[]) {
+function extractFromPatterns(
+  origin: string,
+  matchName: number | string,
+  patterns: RegExp[]
+) {
   for (const pattern of patterns) {
     const match = origin.match(pattern);
     if (match) {
@@ -23,28 +25,28 @@ function extractFromPatterns(origin: string, matchName: number | string, pattern
 
 export function extractOrgSlug(origin: string) {
   return extractFromPatterns(origin, 'orgSlug', [
-    ...patterns.prod,
-    ...patterns.dev,
+    ...PATTERNS.prod,
+    ...PATTERNS.dev,
   ]);
 }
 
 export function extractDomain(origin: string) {
   return extractFromPatterns(origin, 'domain', [
-    ...patterns.prod,
-    ...patterns.dev,
+    ...PATTERNS.prod,
+    ...PATTERNS.dev,
   ]);
 }
 
 export function isProdOrigin(origin: string) {
-  return patterns.prod.some(pattern => origin.match(pattern));
+  return PATTERNS.prod.some((pattern) => origin.match(pattern));
 }
 
 export function isProdDomain(domain: string) {
   // Prefix with some protocol, so a naked domain like `.sentry.io` looks like
   // an `origin` and can match our patterns.
   const protocols = ['http', 'http'];
-  return protocols.some(protocol => 
-    patterns.prod.some(pattern => `${protocol}://${domain}`.match(pattern))
+  return protocols.some((protocol) =>
+    PATTERNS.prod.some((pattern) => `${protocol}://${domain}`.match(pattern))
   );
 }
 

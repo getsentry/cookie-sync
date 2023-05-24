@@ -1,7 +1,7 @@
-import * as React from "react";
-import browser from "webextension-polyfill";
+import * as React from 'react';
+import browser from 'webextension-polyfill';
 
-import type {Message, SyncNowResponse} from "./types";
+import type {Message, SyncNowResponse} from './types';
 
 type State = {
   isLoading: boolean;
@@ -30,12 +30,12 @@ export default function useSyncNow() {
 
     try {
       const results = (await browser.runtime.sendMessage({
-        command: "sync-now",
+        command: 'sync-now',
       } as Message)) as SyncNowResponse;
 
       return setAndReturnState({
         isLoading: false,
-        results: results,
+        results,
         error: undefined,
       });
     } catch (err: unknown) {
@@ -49,6 +49,6 @@ export default function useSyncNow() {
 
   return {
     syncNow,
-    ...state
+    ...state,
   };
 }

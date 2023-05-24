@@ -2,13 +2,13 @@ import browser, {Tabs} from 'webextension-polyfill';
 import toUrl from '../utils/toUrl';
 
 export function tabsToOrigins(tabs: Tabs.Tab[]) {
-  return tabs
-    .map(tab => toUrl(tab.url)?.origin)
-    .filter(Boolean);
+  return tabs.map((tab) => toUrl(tab.url)?.origin).filter(Boolean);
 }
 
 async function findOpenTabsMatching(urls: string[]) {
-  return (await Promise.all(urls.map(url => browser.tabs.query({url})))).flat();
+  return (
+    await Promise.all(urls.map((url) => browser.tabs.query({url})))
+  ).flat();
 }
 
 async function isApiHealthy(origin: string) {
@@ -19,7 +19,7 @@ async function isApiHealthy(origin: string) {
     // If the fetch is successful, then the server is alive
     return response.ok;
   } catch (error) {
-    return (error as Error);
+    return error as Error;
   }
 }
 
@@ -46,7 +46,5 @@ export async function findOpenDevUITabs() {
 }
 
 export async function findOpenProdTabs() {
-  return findOpenTabsMatching([
-    'https://*.sentry.io/*'
-  ]);
+  return findOpenTabsMatching(['https://*.sentry.io/*']);
 }

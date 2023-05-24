@@ -16,9 +16,11 @@ export function isKnownCookie(cookieName: string) {
 }
 
 async function readCookiesFrom(origin: string): Promise<Cookies.Cookie[]> {
-  return (await Promise.all(
-    cookieNames.map(name => browser.cookies.get({name, url: origin}))
-  )).filter(Boolean);
+  return (
+    await Promise.all(
+      cookieNames.map((name) => browser.cookies.get({name, url: origin}))
+    )
+  ).filter(Boolean);
 }
 
 export async function getCookiesByOrigin(origins: string[]) {
@@ -36,7 +38,7 @@ export async function getCookiesByOrigin(origins: string[]) {
 /**
  * Set a Cookie against the target domain.
  *
- * @param url 
+ * @param url
  * @param target Domain where the Cookie should be saved
  * @param cookie Original Cookie to be copied
  * @returns The saved Cookie
@@ -47,7 +49,7 @@ export async function setTargetCookie(
   cookie: Cookies.Cookie
 ): Promise<{
   origin: string;
-  cookie: Cookies.Cookie
+  cookie: Cookies.Cookie;
 }> {
   const details = {
     url: origin,

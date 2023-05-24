@@ -7,16 +7,8 @@ import {
   isProdOrigin,
   orgSlugToOrigin,
 } from './domains';
-import {
-  findOpenDevUITabs,
-  findOpenProdTabs,
-  tabsToOrigins,
-} from './tabs';
-import {
-  getCookiesByOrigin,
-  isKnownCookie,
-  setTargetCookie,
-} from './cookies';
+import {findOpenDevUITabs, findOpenProdTabs, tabsToOrigins} from './tabs';
+import {getCookiesByOrigin, isKnownCookie, setTargetCookie} from './cookies';
 import Storage from './storage';
 import toUrl from '../utils/toUrl';
 import uniq from '../utils/uniq';
@@ -24,13 +16,31 @@ import uniqBy from '../utils/uniqBy';
 
 import type {Message, StorageClearResponse, SyncNowResponse} from '../types';
 
+function debugResults(
+  event: string,
+  results: PromiseSettledResult<{
+    origin: string;
+    cookie: browser.Cookies.Cookie;
+  }>[]
+) {
+  console.log(event);
+  console.table(
+    results.map((result) => {
+      const value = result.status === 'fulfilled' ? result.value : result;
+      return {
+        status: result.status,
+        reason: null,
+        ...value,
+      };
+    })
+  );
+}
+
 /**
  * Look at a list of our open tabs and save a list of found org-slugs for later.
  */
 async function saveFoundOrgs(origins: string[]) {
-  const orgSlugs = origins
-    .map(extractOrgSlug)
-    .filter(Boolean);
+  const orgSlugs = origins.map(extractOrgSlug).filter(Boolean);
 
   await Storage.saveOrg(uniq(orgSlugs));
 }
@@ -48,8 +58,10 @@ async function saveProdCookies(prodOrigins: string[]) {
   // Insert those cookies into storage so we can use them even if the prod tabs
   // get closed and we can't read them fresh again.
   const cookieCache = await Storage.getCookieCache();
-  Array.from(prodCookiesByOrigin.entries()).flatMap(([origin, cookies]) => 
-    cookies.map((cookie) => cookieCache.insert(extractDomain(origin) || origin, cookie))
+  Array.from(prodCookiesByOrigin.entries()).flatMap(([origin, cookies]) =>
+    cookies.map((cookie) =>
+      cookieCache.insert(extractDomain(origin) || origin, cookie)
+    )
   );
   await cookieCache.save();
 }
@@ -58,7 +70,7 @@ async function saveProdCookies(prodOrigins: string[]) {
  * Read open tabs and save the orgs and cookies that we find
  */
 async function findAndCacheData() {
-    const [openDevTabs, openProdTabs] = await Promise.all([
+  const [openDevTabs, openProdTabs] = await Promise.all([
     findOpenDevUITabs(),
     findOpenProdTabs(),
   ]);
@@ -77,16 +89,16 @@ async function setCookiesOnKnownOrgs() {
   ]);
 
   const cookieList = cookieCache.toArray();
-  const targetOrigins = knownOrgSlugs.flatMap(orgSlug => 
+  const targetOrigins = knownOrgSlugs.flatMap((orgSlug) =>
     domains
-      .filter(domain => domain.syncEnabled)
-      .map(domain => orgSlugToOrigin(orgSlug, domain.domain))
+      .filter((domain) => domain.syncEnabled)
+      .map((domain) => orgSlugToOrigin(orgSlug, domain.domain))
   );
 
   const results = Promise.allSettled(
     targetOrigins.flatMap((origin) =>
-      cookieList.map(async ({cookie}) => 
-        await setTargetCookie(origin, extractDomain(origin)!, cookie)
+      cookieList.map(({cookie}) =>
+        setTargetCookie(origin, extractDomain(origin), cookie)
       )
     )
   );
@@ -99,7 +111,9 @@ async function setCookiesOnKnownOrgs() {
  *
  * @param changeInfo
  */
-async function onCookieChanged(changeInfo: Cookies.OnChangedChangeInfoType): Promise<void> {
+async function onCookieChanged(
+  changeInfo: Cookies.OnChangedChangeInfoType
+): Promise<void> {
   const {cookie} = changeInfo;
   if (!isProdDomain(cookie.domain) || !isKnownCookie(cookie.name)) {
     return;
@@ -127,10 +141,7 @@ async function onTabUpdated(
   console.group('Received onTabUpdated', {changeInfo});
 
   const origins = tabsToOrigins([tab]);
-  await Promise.all([
-    saveFoundOrgs(origins),
-    saveProdCookies(origins),
-  ]);
+  await Promise.all([saveFoundOrgs(origins), saveProdCookies(origins)]);
 
   const results = await setCookiesOnKnownOrgs();
   debugResults('Tab did update', results);
@@ -140,12 +151,14 @@ async function onTabUpdated(
 /**
  * When we get a message from the browser, read out the command, exec it and return the result
  */
-async function onMessage(request: Message): Promise<SyncNowResponse | StorageClearResponse | false> {
+async function onMessage(
+  request: Message
+): Promise<SyncNowResponse | StorageClearResponse | false> {
   if (!request.command) {
     return false;
   }
   console.group(`Received "${request.command}" command`);
-  switch(request.command) {
+  switch (request.command) {
     case 'sync-now': {
       await findAndCacheData();
       const results = await setCookiesOnKnownOrgs();
@@ -161,23 +174,6 @@ async function onMessage(request: Message): Promise<SyncNowResponse | StorageCle
       console.groupEnd();
       return false;
   }
-}
-
-function debugResults(event: string, results: PromiseSettledResult<{
-    origin: string;
-    cookie: browser.Cookies.Cookie;
-}>[]) {
-  console.log(event);
-  console.table(
-    results.map((result) => {
-      const value = result.status === 'fulfilled' ? result.value : result;
-      return ({
-        status: result.status,
-        reason: null,
-        ...value,
-      });
-    })
-  );
 }
 
 /**
