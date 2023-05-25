@@ -18,10 +18,13 @@ import type {Message, StorageClearResponse, SyncNowResponse} from '../types';
 
 function debugResults(
   event: string,
-  results: PromiseSettledResult<{
-    origin: string;
-    cookie: browser.Cookies.Cookie;
-  }>[]
+  results: PromiseSettledResult<
+    | {
+        origin: string;
+        cookie: browser.Cookies.Cookie;
+      }
+    | undefined
+  >[]
 ) {
   console.log(event);
   console.table(
@@ -97,9 +100,10 @@ async function setCookiesOnKnownOrgs() {
 
   const results = Promise.allSettled(
     targetOrigins.flatMap((origin) =>
-      cookieList.map(({cookie}) =>
-        setTargetCookie(origin, extractDomain(origin), cookie)
-      )
+      cookieList.map(({cookie}) => {
+        const domain = extractDomain(origin);
+        return domain ? setTargetCookie(origin, domain, cookie) : undefined;
+      })
     )
   );
   return results;
