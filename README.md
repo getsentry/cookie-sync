@@ -2,7 +2,7 @@
 
 A browser plugin to automatically sync cookies for local frontend development of sentry.io. This extension will copy cookies from sentry.io and make them available for your development environment, including version sandbox deployments.
 
-![](./source/assets/example.png)
+![](./source/assets/example-full-chrome.png)
 
 ## 🚀 Installation
 
