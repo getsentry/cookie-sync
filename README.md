@@ -21,7 +21,7 @@ _NOTE: Auto-update will not work with manual installations._
 
 - ### Chromium Based Browsers (Chrome, Edge, Opera)
 
-    1. Visit: [chrome://extensions](chrome://extensions) or [edge://extensions](edge://extensions) or [about://extensions](about://extensions) (in opera).
+    1. Visit: [`chrome://extensions`](chrome://extensions) or [`edge://extensions`](edge://extensions) or [`about://extensions`](about://extensions) (in opera).
     2. Enable `Developer Mode`
         - Chrome/Opera: The toggle button is in the top-right corner 
         - Edge: The toggle button is in the left sidebar
