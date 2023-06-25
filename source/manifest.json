@@ -9,8 +9,8 @@
     "180": "assets/icons/favicon-180.png",
     "192": "assets/icons/favicon-192.png"
   },
-  "description": "Sync cookies for sentry local frontend development. On Github: getsentry/hackweek-cookie-sync",
-  "homepage_url": "https://github.com/getsentry/hackweek-cookie-sync",
+  "description": "Sync cookies for local frontend development of sentry.io",
+  "homepage_url": "https://github.com/getsentry/cookie-sync",
   "short_name": "Cookie Sync",
   "__chrome|edge|opera__permissions": [
     "cookies",

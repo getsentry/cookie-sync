@@ -1,7 +1,6 @@
 # Sentry.io Cookie Sync
 
-A browser pluging to help copy cookies from sentry.io so you can be logged-in to 
-your sentry devapp and vercel sandboxes.
+A browser plugin to automatically sync cookies for local frontend development of sentry.io. This extension will copy cookies from sentry.io and make them available for your development environment, including version sandbox deployments.
 
 ![](./source/assets/example.png)
 
@@ -9,7 +8,7 @@ your sentry devapp and vercel sandboxes.
 
 You can install the latest version of the Cookie Sync extension using the links below:
 
-- [Get Cookie Sync for Chrome](https://chrome.google.com/webstore/detail/sentry-cookie-sync/ojbolbbmkndcafmblpelfdhkggpmdhnm?hl=en&authuser=0)
+- [Get Cookie Sync for Chrome](https://chrome.google.com/webstore/detail/sentry-cookie-sync/kchlmkcdfohlmobgojmipoppgpedhijh)
 - [Get Cookie Sync for Firefox](https://addons.mozilla.org/en-US/firefox/addon/sentry-cookie-sync/)
 
 This is the recommended installation method.

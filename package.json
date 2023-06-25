@@ -1,7 +1,7 @@
 {
   "name": "cookie-sync",
   "version": "0.0.0",
-  "description": "Web extension starter using react and typescript",
+  "description": "Sync cookies for local frontend development of sentry.io",
   "private": true,
   "repository": "https://github.com/getsentry/hackweek-cookie-sync.git",
   "author": {
