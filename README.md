@@ -22,9 +22,11 @@ _NOTE: Auto-update will not work with manual installations._
 
 - ### Chromium Based Browsers (Chrome, Edge, Opera)
 
-    1. Visit: `[chrome://extensions](chrome://extensions)` or `[edge://extensions](edge://extensions)` or `[about://extensions](about://extensions)` (in opera).
-    2. Enable `Developer Mode`. Toggle is in the top-right corner (Chrome, Opera) or left sidebar (Edge)
-        1. If you just enabled developer mode refresh the page.
+    1. Visit: [chrome://extensions](chrome://extensions) or [edge://extensions](edge://extensions) or [about://extensions](about://extensions) (in opera).
+    2. Enable `Developer Mode`
+        - Chrome/Opera: The toggle button is in the top-right corner 
+        - Edge: The toggle button is in the left sidebar
+        - Refresh the page!
     3. Drag & drop the `.zip` file you downloaded into the page.
 
 - ### Firefox
@@ -37,11 +39,15 @@ _NOTE: Auto-update will not work with manual installations._
     3. Visit [about:addons](about:addons)
     4. Drag & drop the `firefox.crx` file you downloaded into the page.
 
+## 🐛 Bugs
+
+Please file an issue [here](https://github.com/getsentry/cookie-sync/issues) for feature requests, bugs, missing documentation, or unexpected behavior.
+
 ## 🖥️ Developing
 
 Ensure you have:
 
-- [Node.js](https://nodejs.org) 10 or later installed
+- [Node.js](https://nodejs.org) 14 or later installed
 - [Yarn](https://yarnpkg.com) v1 or v2 installed
 
 Then run the following:
@@ -51,32 +57,32 @@ Then run the following:
 - `yarn run dev:firefox` to start the development server for firefox addon
 - `yarn run build:chrome` to build chrome extension
 - `yarn run build:firefox` to build firefox addon
-- `yarn run build` builds and packs extensions all at once to extension/ directory
+- `yarn run build` builds and packs extensions all at once to `extension/` directory
 
-### Development
+### Test in Dev Mode
 
 1. `yarn install` to install dependencies.
-2. `yarn run dev:chrome` or `yarn run dev:firefox` To watch file changes in development`
-
+2. `yarn run dev:chrome` or `yarn run dev:firefox` To watch file changes in development
 3. Load the extension in your browser
 
-    _NOTE: Remove any existing version of this extension, if installed_
+    _NOTE: Remove any existing versions first_
 
     #### Chrome
 
-    - Go to the browser address bar and type `chrome://extensions`
+    - Go to the browser address bar and type `chrome://extensions`.
     - Check the `Developer Mode` button to enable it.
     - Click on the `Load Unpacked Extension…` button.
-    - Select your browsers folder in `extension/`.
+    - Select the folder `cookie-sync/extension/chrome`.
 
     #### Firefox [ESR](https://www.mozilla.org/en-US/firefox/enterprise/), [Developer](https://www.mozilla.org/en-US/firefox/developer/), or [Nightly build](https://www.mozilla.org/en-US/firefox/channel/desktop/#nightly)
 
-    - Load the Add-on via `about:debugging` as temporary Add-on.
-    - Choose the `manifest.json` file in the extracted directory
+    - Go to the browser address bar and type `about:debugging#/runtime/this-firefox`.
+    - Click on the `Temporary Extensions` Section, then the `Load Unpacked Extension…` button.
+    - Select the file `cookie-sync/extension/firefox.xpi`.
 
-### Production
+### Test Prod builds
 
-- `yarn run build` builds the extension for all the browsers to `extension/BROWSER` directory respectively.
+- `yarn run build` builds the extension for all the browsers.
 
 Note: By default the `package.json` and `manifest.json` are set with version `0.0.0`. The CI pipeline will set the version before building the bundles.
 
@@ -101,8 +107,6 @@ if the vendor is `chrome` this compiles to:
 }
 ```
 
----
-
 Add keys to multiple vendors by separating them with | in the prefix
 
 ```
@@ -121,9 +125,22 @@ if the vendor is `chrome` or `opera`, this compiles to:
 
 See the original [README](https://github.com/abhijithvijayan/wext-manifest-loader) of `wext-manifest-loader` package for more details
 
-## Bugs
+## Publishing
 
-Please file an issue [here](https://github.com/getsentry/cookie-sync/issues) for feature requests, bugs, missing documentation, or unexpected behavior.
+New versions will be automatically published into the Chrome and Firefox Extension/Addon stores via the Github Actions CI pipeline.
+
+To modify the content of the store pages, you will need access to the respective accounts.
+
+Chrome Store Page:
+
+1. Using your @sentry.io account, become a member of the `role-deploy-sentry-browser-extension` google group
+2. Visit https://chrome.google.com/webstore/devconsole and [Register as a Chrome Web Store developer](https://developer.chrome.com/docs/webstore/register/).
+3. Access the [listing](https://chrome.google.com/webstore/devconsole/d1e3adb2-fbbf-437c-bbbe-e3c0a9d34cfe/kchlmkcdfohlmobgojmipoppgpedhijh/edit/listing) in the "sentry.io" publisher.
+
+Firefox Addon Page:
+
+1. Using 1Password access the "Mozilla Extension Publisher: cookie-sync@sentry.io" credentials
+2. Visit the Firefox Addon Store here: https://addons.mozilla.org/en-US/developers/addon/sentry-cookie-sync/edit
 
 ## License
 
