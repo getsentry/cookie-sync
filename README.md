@@ -32,9 +32,9 @@ _NOTE: Auto-update will not work with manual installations._
 
     1. Get an [ESR](https://www.mozilla.org/en-US/firefox/enterprise/), [Developer](https://www.mozilla.org/en-US/firefox/developer/), or [Nightly build](https://www.mozilla.org/en-US/firefox/channel/desktop/#nightly) of firefox.
     2. Follow Mozilla's instructions to enable installing unsigned addons [here](https://support.mozilla.org/en-US/kb/add-on-signing-in-firefox#w_what-are-my-options-if-i-want-to-use-an-unsigned-add-on-advanced-users).
-      - Visit [about:config](about:config)
-      - Set `xpinstall.signatures.required = false`
-      - Set `extensions.langpacks.signatures.required = false`
+        - Visit [`about:config`](about:config)
+        - Set `xpinstall.signatures.required = false`
+        - Set `extensions.langpacks.signatures.required = false`
     3. Visit [about:addons](about:addons)
     4. Drag & drop the `firefox.crx` file you downloaded into the page.
 
