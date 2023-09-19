@@ -23,7 +23,7 @@ function useReleasedVersions({currentVersion}: {currentVersion: string}) {
 
   const fetchReleases = async () => {
     const response = await fetch(
-      'https://api.github.com/repos/getsentry/hackweek-cookie-sync/releases'
+      'https://api.github.com/repos/getsentry/cookie-sync/releases'
     );
     setReleases({
       status: response.status,
@@ -77,7 +77,7 @@ export default function VersionBadge() {
           <div>
             A{' '}
             <a
-              href="https://github.com/getsentry/hackweek-cookie-sync/releases"
+              href="https://github.com/getsentry/cookie-sync/releases"
               target="_blank"
               rel="noreferrer"
             >
