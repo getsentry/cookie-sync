@@ -1,7 +1,6 @@
 const PATTERNS = {
   prod: [/https:\/\/(?<orgSlug>.*)(?<domain>\.sentry\.io)/],
   dev: [
-    /http:\/\/(?<orgSlug>.*)(?<domain>\.localhost)/,
     /https:\/\/(?<orgSlug>.*)(?<domain>\.sentry\.dev)/,
     /https:\/\/(?<orgSlug>.*)(?<domain>\.dev\.getsentry\.net)/,
   ],
@@ -44,10 +43,7 @@ export function isProdOrigin(origin: string) {
 export function isProdDomain(domain: string) {
   // Prefix with some protocol, so a naked domain like `.sentry.io` looks like
   // an `origin` and can match our patterns.
-  const protocols = ['http', 'http'];
-  return protocols.some((protocol) =>
-    PATTERNS.prod.some((pattern) => `${protocol}://${domain}`.match(pattern))
-  );
+  return PATTERNS.prod.some((pattern) => `https://${domain}`.match(pattern));
 }
 
 export function orgSlugToOrigin(orgSlug: string, domain: string) {

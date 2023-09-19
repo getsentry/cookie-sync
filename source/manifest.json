@@ -22,13 +22,11 @@
     "storage",
     "tabs",
     "https://*.sentry.io/*",
-    "https://*.localhost/*",
     "https://*.sentry.dev/*",
     "https://*.dev.getsentry.net/*"
   ],
   "__chrome|edge|opera__host_permissions": [
     "https://*.sentry.io/*",
-    "https://*.localhost/*",
     "https://*.sentry.dev/*",
     "https://*.dev.getsentry.net/*"
   ],

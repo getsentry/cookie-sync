@@ -61,7 +61,6 @@ export async function setTargetCookie(
     secure: cookie.secure,
     value: cookie.value,
   };
-  // console.info('Setting cookie', {details});
   const updated = await browser.cookies.set(details);
   return {origin, cookie: updated};
 }
