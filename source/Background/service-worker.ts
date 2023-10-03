@@ -1,10 +1,8 @@
-import browser, {Cookies, Tabs} from 'webextension-polyfill';
+import browser from 'webextension-polyfill';
 
 import {
   extractDomain,
   extractOrgSlug,
-  isProdDomain,
-  isProdOrigin,
   orgSlugToOrigin,
 } from './domains';
 import {
@@ -14,11 +12,9 @@ import {
 } from './tabs';
 import {
   getCookiesByOrigin,
-  isKnownCookie,
   setTargetCookie,
 } from './cookies';
 import Storage from './storage';
-import toUrl from '../utils/toUrl';
 import uniq from '../utils/uniq';
 import uniqBy from '../utils/uniqBy';
 
@@ -93,49 +89,6 @@ async function setCookiesOnKnownOrgs() {
   return results;
 }
 
-/**
- * When a cookie is updated (logging in or out of sentry.io) we should automatically
- * propagate that into all our targets.
- *
- * @param changeInfo
- */
-async function onCookieChanged(changeInfo: Cookies.OnChangedChangeInfoType): Promise<void> {
-  const {cookie} = changeInfo;
-  if (!isProdDomain(cookie.domain) || !isKnownCookie(cookie.name)) {
-    return;
-  }
-  console.group('Received onCookieChanged', {changeInfo});
-
-  const cookieCache = await Storage.getCookieCache();
-  cookieCache.insert(cookie.domain, cookie);
-  await cookieCache.save();
-
-  const results = await setCookiesOnKnownOrgs();
-  debugResults('Cookie did update', results);
-  console.groupEnd();
-}
-
-async function onTabUpdated(
-  _tabId: number,
-  changeInfo: Tabs.OnUpdatedChangeInfoType,
-  tab: Tabs.Tab
-): Promise<void> {
-  const origin = toUrl(tab.url)?.origin;
-  if (!origin || !isProdOrigin(origin)) {
-    return;
-  }
-  console.group('Received onTabUpdated', {changeInfo});
-
-  const origins = tabsToOrigins([tab]);
-  await Promise.all([
-    saveFoundOrgs(origins),
-    saveProdCookies(origins),
-  ]);
-
-  const results = await setCookiesOnKnownOrgs();
-  debugResults('Tab did update', results);
-  console.groupEnd();
-}
 
 /**
  * When we get a message from the browser, read out the command, exec it and return the result
