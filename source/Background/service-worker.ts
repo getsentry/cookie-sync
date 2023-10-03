@@ -188,8 +188,8 @@ function debugResults(event: string, results: PromiseSettledResult<{
   Storage.clear();
   console.info('Cookie Sync Service Worker is starting...');
 
-  browser.cookies.onChanged.addListener(onCookieChanged);
-  browser.tabs.onUpdated.addListener(onTabUpdated);
+  // browser.cookies.onChanged.addListener(onCookieChanged);
+  // browser.tabs.onUpdated.addListener(onTabUpdated);
   browser.runtime.onMessage.addListener(onMessage);
 
   await onMessage({command: 'sync-now'});
