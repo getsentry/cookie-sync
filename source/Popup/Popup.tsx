@@ -1,4 +1,5 @@
 import * as React from 'react';
+import browser from 'webextension-polyfill';
 
 import DomainsEnabled from './DomainsEnabled';
 import FailedIcon from '../icons/FailedIcon';
@@ -16,7 +17,14 @@ const Popup = () => {
       <h1>Cookie Sync</h1>
 
       <DomainsEnabled />
-      <div style={{textAlign: 'center'}}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '8px',
+        }}
+      >
         <button
           type="button"
           className="sync-button"
@@ -24,6 +32,31 @@ const Popup = () => {
           disabled={isLoading}
         >
           Sync Cookies Now
+        </button>
+        <button
+          type="button"
+          className="dev-ui-button"
+          onClick={() => {
+            browser.tabs
+              .query({currentWindow: true, active: true})
+              .then((tabs) => {
+                const tab = tabs[0];
+                if (!tab) {
+                  throw new Error('No active tab');
+                }
+
+                const newUrl = tab.url?.replace(
+                  'sentry.io',
+                  'dev.getsentry.net:7999'
+                );
+                return browser.tabs.create({url: newUrl});
+              })
+              .catch((e: unknown) => {
+                console.error('Error opening new tab', e);
+              });
+          }}
+        >
+          Open in Dev UI
         </button>
       </div>
 

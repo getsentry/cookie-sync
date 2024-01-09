@@ -43,6 +43,25 @@ h1 {
   margin-bottom: 10px;
 }
 
+.dev-ui-button {
+  border-radius: 4px;
+  display: inline-block;
+  border-radius: 4px;
+  text-transform: none;
+  font-weight: 600;
+  color: #FFFFFF;
+  background-color: rgba(255, 255, 255, 0.1);
+  height: 34px;
+  font-size: 0.875rem;
+  line-height: 1rem;
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
 .result {
   display: flex;
   gap: 8px;
