@@ -45,7 +45,7 @@ const Popup = () => {
                   throw new Error('No active tab');
                 }
 
-                const newUrl = tab?.url?.replace(
+                const newUrl = tab.url?.replace(
                   'sentry.io',
                   'dev.getsentry.net:7999'
                 );
