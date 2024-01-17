@@ -3,12 +3,8 @@ import uniq from '../utils/uniq';
 
 const cookieNames: ReadonlyArray<string> = [
   'session', // Normal session cookie, you'll have this whether logged in or out
-  'sentry-su', // SUPERUSER_COOKIE_NAME
-  'su', // SUPERUSER_COOKIE_NAME
   'sentry-sc', // CSRF_COOKIE_NAME
   'sc', // CSRF_COOKIE_NAME
-  'sentry-sudo', // SUDO_COOKIE_NAME
-  'sudo', // SUDO_COOKIE_NAME
 ];
 
 export function isKnownCookie(cookieName: string) {
