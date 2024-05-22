@@ -5,6 +5,8 @@ const cookieNames: ReadonlyArray<string> = [
   'session', // Normal session cookie, you'll have this whether logged in or out
   'sentry-su', // SUPERUSER_COOKIE_NAME
   'su', // SUPERUSER_COOKIE_NAME
+  'sentry-staff', // STAFF_COOKIE_NAME
+  'staff', // STAFF_COOKIE_NAME
   'sentry-sc', // CSRF_COOKIE_NAME
   'sc', // CSRF_COOKIE_NAME
   'sentry-sudo', // SUDO_COOKIE_NAME
