@@ -38,6 +38,20 @@ _NOTE: Auto-update will not work with manual installations._
     3. Visit [about:addons](about:addons)
     4. Drag & drop the `firefox.crx` file you downloaded into the page.
 
+- ### Safari
+
+    The full extension is not avaialble on Safari. Instead you can manually read
+    cookies from the extension inside Firefox or a Chrome based browser then
+    write those cookies into Safari.s
+
+    *Using a browser with this extension installed:*
+    1. login to production and also the domain you want to use within Safari.
+         - for example, login to [sentry.sentry.io](https://sentry.sentry.io) to get refreshed cookies
+         - then visit to [sentry.dev.getsentry.net:7999](https://sentry.dev.getsentry.net:7999) so the extension learns about that domain too
+    2. Open the extension and click "Sync Cookies Now".
+    3. Click the "Copy" button next to the domain you want to use within Safari.
+    4. Paste the copied `document.cookie=...` snippet into the Safari JavaScript Console.
+
 ## 🐛 Bugs
 
 Please file an issue [here](https://github.com/getsentry/cookie-sync/issues) for feature requests, bugs, missing documentation, or unexpected behavior.
