@@ -42,7 +42,7 @@ _NOTE: Auto-update will not work with manual installations._
 
     The full extension is not avaialble on Safari. Instead you can manually read
     cookies from the extension inside Firefox or a Chrome based browser then
-    write those cookies into Safari.s
+    write those cookies into Safari.
 
     *Using a browser with this extension installed:*
     1. login to production and also the domain you want to use within Safari.
