@@ -1,6 +1,7 @@
 import browser, {Cookies} from 'webextension-polyfill';
 import uniq from '../utils/uniq';
 import uniqBy from '../utils/uniqBy';
+import {Domain} from '../types';
 
 type CookiesByNameAndOrg = {
   [orgSlug: string]: {
@@ -8,19 +9,19 @@ type CookiesByNameAndOrg = {
   };
 };
 
-type Domain = {
-  domain: string;
+type SyncDomain = {
+  domain: Domain;
   syncEnabled: boolean;
 };
 
 type StorageFields = {
   cookies: CookiesByNameAndOrg;
-  domains: Domain[];
+  domains: SyncDomain[];
   orgs: string[];
 };
 
 const DEFAULT_ORGS: ReadonlyArray<string> = [];
-const DEFAULT_DOMAINS: ReadonlyArray<Domain> = [
+const DEFAULT_DOMAINS: ReadonlyArray<SyncDomain> = [
   {domain: 'dev.getsentry.net:7999', syncEnabled: true},
   {domain: 'sentry.dev', syncEnabled: true},
 ];
@@ -35,7 +36,7 @@ const localStorage = {
 class CookieCache {
   constructor(private cache: CookiesByNameAndOrg) {}
 
-  insert(domain: string, cookie: Cookies.Cookie) {
+  insert(domain: Domain, cookie: Cookies.Cookie): void {
     this.cache = {
       ...this.cache,
       [domain]: {
@@ -45,15 +46,19 @@ class CookieCache {
     };
   }
 
-  save = async () => {
+  save = async (): Promise<void> => {
     await localStorage.set({cookies: this.cache});
   };
 
-  toArray = () => {
+  toArray = (): {
+    domain: Domain;
+    cookieName: string;
+    cookie: Cookies.Cookie;
+  }[] => {
     return Object.entries(this.cache)
       .map(([domain, cookiesByName]) =>
         Object.entries(cookiesByName).map(([cookieName, cookie]) => ({
-          domain,
+          domain: domain as Domain,
           cookieName,
           cookie,
         }))
@@ -83,9 +88,11 @@ class Storage {
     return result.domains ?? DEFAULT_DOMAINS;
   };
 
-  setDomain = async (opts: Pick<Domain, 'domain'> & Partial<Domain>) => {
+  setDomain = async (
+    opts: Pick<SyncDomain, 'domain'> & Partial<SyncDomain>
+  ) => {
     const prevDomains = await this.getDomains();
-    const updated: Domain = {
+    const updated: SyncDomain = {
       syncEnabled: true,
       ...prevDomains.find((domain) => domain.domain === opts.domain),
       ...opts,
@@ -100,19 +107,19 @@ class Storage {
     });
   };
 
-  getOrgs = async () => {
+  getOrgs = async (): Promise<string[]> => {
     const result = await localStorage.get('orgs');
     return Array.from(result.orgs || DEFAULT_ORGS);
   };
 
-  saveOrg = async (orgSlugs: string | string[]) => {
+  saveOrg = async (orgSlugs: string | string[]): Promise<void> => {
     const prevOrgs = await this.getOrgs();
     await localStorage.set({
       orgs: uniq(prevOrgs.concat(orgSlugs)),
     });
   };
 
-  getCookieCache = async () => {
+  getCookieCache = async (): Promise<CookieCache> => {
     if (!this.cookieCache) {
       const all = await localStorage.get('cookies');
       this.cookieCache = new CookieCache(all.cookies || {});

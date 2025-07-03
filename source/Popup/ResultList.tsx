@@ -9,7 +9,7 @@ import uniqBy from '../utils/uniqBy';
 import type {SyncNowResponse} from '../types';
 import CopyButton from './CopyButton';
 
-const ResultList = ({results}: {results: SyncNowResponse}) => {
+export default function ResultList({results}: {results: SyncNowResponse}) {
   const successfulCookies = Array.from(
     new Set(
       results.map((promiseResult) =>
@@ -104,6 +104,4 @@ const ResultList = ({results}: {results: SyncNowResponse}) => {
       </table>
     </>
   );
-};
-
-export default ResultList;
+}

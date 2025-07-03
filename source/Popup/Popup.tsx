@@ -9,7 +9,7 @@ import VersionBadge from './VersionBadge';
 
 import './popup.css';
 
-const Popup = () => {
+export default function Popup() {
   const {results, isLoading, error, syncNow} = useSyncNow();
 
   return (
@@ -73,6 +73,4 @@ const Popup = () => {
       <VersionBadge />
     </section>
   );
-};
-
-export default Popup;
+}

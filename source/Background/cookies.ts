@@ -1,5 +1,6 @@
 import browser, {Cookies} from 'webextension-polyfill';
 import uniq from '../utils/uniq';
+import type {Domain, Origin} from '../types';
 
 const cookieNames: ReadonlyArray<string> = [
   'session', // Normal session cookie, you'll have this whether logged in or out
@@ -13,11 +14,11 @@ const cookieNames: ReadonlyArray<string> = [
   'sudo', // SUDO_COOKIE_NAME
 ];
 
-export function isKnownCookie(cookieName: string) {
+export function isKnownCookie(cookieName: string): boolean {
   return cookieNames.includes(cookieName);
 }
 
-async function readCookiesFrom(origin: string): Promise<Cookies.Cookie[]> {
+async function readCookiesFrom(origin: Origin): Promise<Cookies.Cookie[]> {
   return (
     await Promise.all(
       cookieNames.map((name) => browser.cookies.get({name, url: origin}))
@@ -25,8 +26,10 @@ async function readCookiesFrom(origin: string): Promise<Cookies.Cookie[]> {
   ).filter(Boolean);
 }
 
-export async function getCookiesByOrigin(origins: string[]) {
-  const cookiesByOrigin = new Map<string, Cookies.Cookie[]>();
+export async function getCookiesByOrigin(
+  origins: Origin[]
+): Promise<Map<Origin, browser.Cookies.Cookie[]>> {
+  const cookiesByOrigin = new Map<Origin, Cookies.Cookie[]>();
   await Promise.all(
     uniq(origins).map(async (origin) => {
       const cookies = await readCookiesFrom(origin);
@@ -46,11 +49,11 @@ export async function getCookiesByOrigin(origins: string[]) {
  * @returns The saved Cookie
  */
 export async function setTargetCookie(
-  origin: string,
-  targetDomain: string,
+  origin: Origin,
+  targetDomain: Domain,
   cookie: Cookies.Cookie
 ): Promise<{
-  origin: string;
+  origin: Origin;
   cookie: Cookies.Cookie;
 }> {
   const details = {

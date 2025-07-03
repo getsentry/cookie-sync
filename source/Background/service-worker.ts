@@ -14,7 +14,13 @@ import toUrl from '../utils/toUrl';
 import uniq from '../utils/uniq';
 import uniqBy from '../utils/uniqBy';
 
-import type {Message, StorageClearResponse, SyncNowResponse} from '../types';
+import type {
+  Domain,
+  Message,
+  Origin,
+  StorageClearResponse,
+  SyncNowResponse,
+} from '../types';
 
 function debugResults(
   event: string,
@@ -42,7 +48,7 @@ function debugResults(
 /**
  * Look at a list of our open tabs and save a list of found org-slugs for later.
  */
-async function saveFoundOrgs(origins: string[]) {
+async function saveFoundOrgs(origins: Origin[]) {
   const orgSlugs = origins.map(extractOrgSlug).filter(Boolean);
 
   await Storage.saveOrg(uniq(orgSlugs));
@@ -52,7 +58,7 @@ async function saveFoundOrgs(origins: string[]) {
  * Look at a list of open `*.sentry.io` tabs, grab the cookies from them and
  * save them for later.
  */
-async function saveProdCookies(prodOrigins: string[]) {
+async function saveProdCookies(prodOrigins: Origin[]) {
   // The cookies are the same on `foo.sentry.io` and `bar.sentry.io`, they're
   // set against `.sentry.io`. So we only need to ask for each unique host.
   const origins = uniqBy(prodOrigins, extractDomain);
@@ -62,9 +68,12 @@ async function saveProdCookies(prodOrigins: string[]) {
   // get closed and we can't read them fresh again.
   const cookieCache = await Storage.getCookieCache();
   Array.from(prodCookiesByOrigin.entries()).flatMap(([origin, cookies]) =>
-    cookies.map((cookie) =>
-      cookieCache.insert(extractDomain(origin) || origin, cookie)
-    )
+    cookies.forEach((cookie) => {
+      const domain = extractDomain(origin);
+      if (domain) {
+        cookieCache.insert(domain, cookie);
+      }
+    })
   );
   await cookieCache.save();
 }
@@ -125,7 +134,7 @@ async function onCookieChanged(
   console.group('Received onCookieChanged', {changeInfo});
 
   const cookieCache = await Storage.getCookieCache();
-  cookieCache.insert(cookie.domain, cookie);
+  cookieCache.insert(cookie.domain as Domain, cookie);
   await cookieCache.save();
 
   const results = await setCookiesOnKnownOrgs();
@@ -138,7 +147,7 @@ async function onTabUpdated(
   changeInfo: Tabs.OnUpdatedChangeInfoType,
   tab: Tabs.Tab
 ): Promise<void> {
-  const origin = toUrl(tab.url)?.origin;
+  const origin = toUrl(tab.url)?.origin as Origin;
   if (!origin || !isProdOrigin(origin)) {
     return;
   }
