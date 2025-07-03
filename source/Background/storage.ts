@@ -1,7 +1,7 @@
 import browser, {Cookies} from 'webextension-polyfill';
 import uniq from '../utils/uniq';
 import uniqBy from '../utils/uniqBy';
-import {Domain} from '../types';
+import {Domain} from './domains';
 
 type CookiesByNameAndOrg = {
   [orgSlug: string]: {

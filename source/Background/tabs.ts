@@ -1,6 +1,6 @@
 import browser, {Tabs} from 'webextension-polyfill';
 import toUrl from '../utils/toUrl';
-import type {Origin} from '../types';
+import type {Origin} from './domains';
 
 export function tabsToOrigins(tabs: Tabs.Tab[]): Origin[] {
   return tabs.map((tab) => toUrl(tab.url)?.origin as Origin).filter(Boolean);

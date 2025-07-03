@@ -1,6 +1,7 @@
 import browser, {Cookies} from 'webextension-polyfill';
 import uniq from '../utils/uniq';
-import type {Domain, Origin} from '../types';
+import {extractDomain} from './domains';
+import type {Origin} from './domains';
 
 const cookieNames: ReadonlyArray<string> = [
   'session', // Normal session cookie, you'll have this whether logged in or out
@@ -18,7 +19,7 @@ export function isKnownCookie(cookieName: string): boolean {
   return cookieNames.includes(cookieName);
 }
 
-async function readCookiesFrom(origin: Origin): Promise<Cookies.Cookie[]> {
+async function getKnownCookieFor(origin: Origin): Promise<Cookies.Cookie[]> {
   return (
     await Promise.all(
       cookieNames.map((name) => browser.cookies.get({name, url: origin}))
@@ -26,13 +27,19 @@ async function readCookiesFrom(origin: Origin): Promise<Cookies.Cookie[]> {
   ).filter(Boolean);
 }
 
+/**
+ * Get a list of cookies we care about for each origin requested
+ *
+ * @param origins List of Origin values
+ * @returns Map<Origin, Cookie[]>
+ */
 export async function getCookiesByOrigin(
   origins: Origin[]
 ): Promise<Map<Origin, browser.Cookies.Cookie[]>> {
   const cookiesByOrigin = new Map<Origin, Cookies.Cookie[]>();
   await Promise.all(
     uniq(origins).map(async (origin) => {
-      const cookies = await readCookiesFrom(origin);
+      const cookies = await getKnownCookieFor(origin);
       cookiesByOrigin.set(origin, cookies);
     })
   );
@@ -43,22 +50,25 @@ export async function getCookiesByOrigin(
 /**
  * Set a Cookie against the target domain.
  *
- * @param url
- * @param target Domain where the Cookie should be saved
+ * @param origin The request-URI to associate with the setting of the cookie
+ * @param targetDomain Domain, extracted from the origin, where the Cookie should be saved
  * @param cookie Original Cookie to be copied
- * @returns The saved Cookie
+ * @returns {origin: Origin, cookie: Cookie}
  */
 export async function setTargetCookie(
   origin: Origin,
-  targetDomain: Domain,
   cookie: Cookies.Cookie
 ): Promise<{
   origin: Origin;
   cookie: Cookies.Cookie;
-}> {
-  const details = {
+} | undefined> {
+  const domain = extractDomain(origin);
+  if (!domain) {
+    return undefined;
+  }
+  const details: browser.Cookies.SetDetailsType = {
     url: origin,
-    domain: targetDomain,
+    domain,
     expirationDate: cookie.expirationDate,
     httpOnly: cookie.httpOnly,
     name: cookie.name,

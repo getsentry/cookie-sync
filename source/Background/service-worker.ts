@@ -1,11 +1,13 @@
 import browser, {Cookies, Tabs} from 'webextension-polyfill';
 
 import {
+  Domain,
   extractDomain,
   extractOrgSlug,
   isProdDomain,
   isProdOrigin,
   orgSlugToOrigin,
+  Origin,
 } from './domains';
 import {findOpenDevUITabs, findOpenProdTabs, tabsToOrigins} from './tabs';
 import {getCookiesByOrigin, isKnownCookie, setTargetCookie} from './cookies';
@@ -14,13 +16,7 @@ import toUrl from '../utils/toUrl';
 import uniq from '../utils/uniq';
 import uniqBy from '../utils/uniqBy';
 
-import type {
-  Domain,
-  Message,
-  Origin,
-  StorageClearResponse,
-  SyncNowResponse,
-} from '../types';
+import type {Message, StorageClearResponse, SyncNowResponse} from '../types';
 
 function debugResults(
   event: string,
@@ -109,14 +105,15 @@ async function setCookiesOnKnownOrgs() {
 
   const results = Promise.allSettled(
     targetOrigins.flatMap((origin) =>
-      cookieList.map(({cookie}) => {
-        const domain = extractDomain(origin);
-        return domain ? setTargetCookie(origin, domain, cookie) : undefined;
-      })
+      cookieList.map(({cookie}) => setTargetCookie(origin, cookie))
     )
   );
   return results;
 }
+
+// ////////////////////////////////////////////////////////////////////////////
+// Event listeners
+// ////////////////////////////////////////////////////////////////////////////
 
 /**
  * When a cookie is updated (logging in or out of sentry.io) we should automatically
@@ -174,6 +171,7 @@ async function onMessage(
   switch (request.command) {
     case 'sync-now': {
       await findAndCacheData();
+
       const results = await setCookiesOnKnownOrgs();
       debugResults('Sync complete', results);
       console.groupEnd();
