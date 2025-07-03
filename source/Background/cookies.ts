@@ -58,10 +58,13 @@ export async function getCookiesByOrigin(
 export async function setTargetCookie(
   origin: Origin,
   cookie: Cookies.Cookie
-): Promise<{
-  origin: Origin;
-  cookie: Cookies.Cookie;
-} | undefined> {
+): Promise<
+  | {
+      origin: Origin;
+      cookie: Cookies.Cookie;
+    }
+  | undefined
+> {
   const domain = extractDomain(origin);
   if (!domain) {
     return undefined;
