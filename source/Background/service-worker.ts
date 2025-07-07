@@ -44,71 +44,105 @@ function debugResults(
 /**
  * Look at a list of our open tabs and save a list of found org-slugs for later.
  */
-async function saveFoundOrgs(origins: Origin[]) {
-  const orgSlugs = origins.map(extractOrgSlug).filter(Boolean);
-
-  await Storage.saveOrg(uniq(orgSlugs));
+async function saveFoundOrgs(origins: Origin[]): Promise<void> {
+  const orgSlugs = uniq(origins.map(extractOrgSlug).filter(Boolean));
+  console.log('saveFoundOrgs', {origins, orgSlugs});
+  return Storage.saveOrg(orgSlugs);
 }
 
 /**
  * Look at a list of open `*.sentry.io` tabs, grab the cookies from them and
  * save them for later.
  */
-async function saveProdCookies(prodOrigins: Origin[]) {
+async function saveProdCookies(prodOrigins: Origin[]): Promise<void> {
   // The cookies are the same on `foo.sentry.io` and `bar.sentry.io`, they're
   // set against `.sentry.io`. So we only need to ask for each unique host.
-  const origins = uniqBy(prodOrigins, extractDomain);
-  const prodCookiesByOrigin = await getCookiesByOrigin(origins);
+  const uniqOrigins = uniqBy(prodOrigins, extractDomain);
+  const prodCookiesByOrigin = await getCookiesByOrigin(uniqOrigins);
 
   // Insert those cookies into storage so we can use them even if the prod tabs
   // get closed and we can't read them fresh again.
   const cookieCache = await Storage.getCookieCache();
+  console.group('saveProdCookies');
+  console.log('saving cookies...', {
+    prodOrigins,
+    uniqOrigins,
+    prodCookiesByOrigin,
+    cookieCache: cookieCache.toArray(),
+  });
   Array.from(prodCookiesByOrigin.entries()).flatMap(([origin, cookies]) =>
     cookies.forEach((cookie) => {
       const domain = extractDomain(origin);
       if (domain) {
         cookieCache.insert(domain, cookie);
+        console.log('inserted', {origin, domain, cookie});
       }
     })
   );
-  await cookieCache.save();
+  console.groupEnd();
+  return cookieCache.save();
 }
 
 /**
  * Read open tabs and save the orgs and cookies that we find
  */
-async function findAndCacheData() {
+async function findAndCacheData(): Promise<[void, void]> {
+  console.group('findAndCacheData');
   const [openDevTabs, openProdTabs] = await Promise.all([
     findOpenDevUITabs(),
     findOpenProdTabs(),
   ]);
+  console.log('found tabs', {openDevTabs, openProdTabs});
 
-  await Promise.all([
+  const results = await Promise.all([
     saveFoundOrgs(tabsToOrigins([...openDevTabs, ...openProdTabs])),
     saveProdCookies(tabsToOrigins(openProdTabs)),
   ]);
+  console.groupEnd();
+  return results;
 }
 
-async function setCookiesOnKnownOrgs() {
-  const [knownOrgSlugs, domains, cookieCache] = await Promise.all([
+async function setCookiesOnKnownOrgs(): Promise<
+  PromiseSettledResult<
+    | {
+        origin: string;
+        cookie: browser.Cookies.Cookie;
+      }
+    | undefined
+  >[]
+> {
+  console.group('setCookiesOnKnownOrgs');
+  const [knownOrgSlugs, targetDomains, cookieCache] = await Promise.all([
     Storage.getOrgs(),
     Storage.getDomains(),
     Storage.getCookieCache(),
   ]);
 
-  const cookieList = cookieCache.toArray();
   const targetOrigins = knownOrgSlugs.flatMap((orgSlug) =>
-    domains
+    targetDomains
       .filter((domain) => domain.syncEnabled)
       .map((domain) => orgSlugToOrigin(orgSlug, domain.domain))
   );
 
-  const results = Promise.allSettled(
-    targetOrigins.flatMap((origin) =>
-      cookieList.map(({cookie}) => setTargetCookie(origin, cookie))
+  console.log('setting cookies onto', {
+    knownOrgSlugs,
+    targetDomains,
+    targetOrigins,
+  });
+
+  const cookieList = cookieCache.toArray();
+  const cookieStores = await browser.cookies.getAllCookieStores();
+  const settled = await Promise.allSettled(
+    targetOrigins.flatMap((targetOrigin) =>
+      cookieStores.flatMap((store) =>
+        cookieList.map(({cookie}) =>
+          setTargetCookie(targetOrigin, cookie, store)
+        )
+      )
     )
   );
-  return results;
+  console.groupEnd();
+  return settled;
 }
 
 // ////////////////////////////////////////////////////////////////////////////
@@ -175,6 +209,8 @@ async function onMessage(
       const results = await setCookiesOnKnownOrgs();
       debugResults('Sync complete', results);
       console.groupEnd();
+      const stores = await browser.cookies.getAllCookieStores();
+      console.log('cookie stores', stores);
       return results;
     }
     case 'storage-clear':

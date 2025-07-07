@@ -1,6 +1,6 @@
 import browser, {Cookies} from 'webextension-polyfill';
 import uniq from '../utils/uniq';
-import {extractDomain} from './domains';
+import {extractDomain, extractOrgSlug, stripPort} from './domains';
 import type {Origin} from './domains';
 
 const cookieNames: ReadonlyArray<string> = [
@@ -56,8 +56,9 @@ export async function getCookiesByOrigin(
  * @returns {origin: Origin, cookie: Cookie}
  */
 export async function setTargetCookie(
-  origin: Origin,
-  cookie: Cookies.Cookie
+  targetOrigin: Origin,
+  cookie: Cookies.Cookie,
+  store: browser.Cookies.CookieStore
 ): Promise<
   | {
       origin: Origin;
@@ -65,20 +66,29 @@ export async function setTargetCookie(
     }
   | undefined
 > {
-  const domain = extractDomain(origin);
-  if (!domain) {
+  const orgSlug = extractOrgSlug(targetOrigin);
+  const domain = extractDomain(targetOrigin);
+  if (!orgSlug) {
+    console.log('setTargetCookie: no orgSlug found', {targetOrigin});
     return undefined;
   }
+  if (!domain) {
+    console.log('setTargetCookie: no domain found', {targetOrigin});
+    return undefined;
+  }
+
   const details: browser.Cookies.SetDetailsType = {
-    url: origin,
-    domain,
+    url: `${targetOrigin}`,
+    domain: `${orgSlug}.${stripPort(domain)}`,
     expirationDate: cookie.expirationDate,
     httpOnly: cookie.httpOnly,
     name: cookie.name,
     sameSite: cookie.sameSite,
     secure: cookie.secure,
+    storeId: store.id,
     value: cookie.value,
   };
   const updated = await browser.cookies.set(details);
-  return {origin, cookie: updated};
+  console.log('setTargetCookie: set', {cookie, targetOrigin, details, updated});
+  return {origin: targetOrigin, cookie: updated};
 }

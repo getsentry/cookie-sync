@@ -67,7 +67,7 @@ export default function Popup() {
       ) : null}
 
       <div className="result">
-        {results?.length ? <ResultList results={results} /> : null}
+        {results ? <ResultList results={results} /> : null}
       </div>
     </section>
   );
