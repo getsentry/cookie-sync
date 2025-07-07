@@ -5,34 +5,32 @@ import Storage from '../Background/storage';
 import './domainsEnabled.css';
 
 // eslint-disable-next-line
-type Domains = Awaited<ReturnType<typeof Storage.getDomains>>;
+type SyncDomains = Awaited<ReturnType<typeof Storage.getDomains>>;
 
-const useDomainsEnabled = () => {
-  const [domains, setDomains] = React.useState<Domains>();
+function useDomainsEnabled() {
+  const [domains, setDomains] = React.useState<SyncDomains>();
 
   const refreshDomains = React.useCallback(() => {
     Storage.getDomains().then(setDomains);
   }, []);
 
-  React.useEffect(() => {
-    refreshDomains();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  React.useEffect(refreshDomains, [refreshDomains]);
 
   return {
     domains,
     refreshDomains,
   };
-};
+}
 
-const ListItem = ({
+function ListItem({
   domain,
   disabled = false,
   refreshDomains,
 }: {
-  domain: Domains[number];
+  domain: SyncDomains[number];
   disabled?: boolean;
   refreshDomains: ReturnType<typeof useDomainsEnabled>['refreshDomains'];
-}) => {
+}) {
   return (
     <li>
       <label htmlFor={`input-domain-${domain.domain}`}>
@@ -53,9 +51,9 @@ const ListItem = ({
       </label>
     </li>
   );
-};
+}
 
-const DomainsEnabled = () => {
+export default function DomainsEnabled() {
   const {domains, refreshDomains} = useDomainsEnabled();
 
   return (
@@ -84,6 +82,4 @@ const DomainsEnabled = () => {
       </div>
     </section>
   );
-};
-
-export default DomainsEnabled;
+}

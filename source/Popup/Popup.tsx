@@ -8,7 +8,7 @@ import useSyncNow from '../useSyncNow';
 
 import './popup.css';
 
-const Popup = () => {
+export default function Popup() {
   const {results, isLoading, error, syncNow} = useSyncNow();
 
   return (
@@ -71,6 +71,4 @@ const Popup = () => {
       </div>
     </section>
   );
-};
-
-export default Popup;
+}
