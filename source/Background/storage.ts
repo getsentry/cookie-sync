@@ -46,8 +46,8 @@ class CookieCache {
     };
   }
 
-  save = async (): Promise<void> => {
-    await localStorage.set({cookies: this.cache});
+  save = (): Promise<void> => {
+    return localStorage.set({cookies: this.cache});
   };
 
   toArray = (): {

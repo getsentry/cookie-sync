@@ -4,11 +4,19 @@
  *
  * https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Origin
  */
-export type ProdOrigin = `https://${string}.sentry.io/`;
+export type ProdOrigin = `https://${string}.sentry.io`;
 export type DevOrigin =
-  | `https://${string}.sentry.dev/`
-  | `https://${string}.dev.getsentry.net:7999/`;
+  | `https://${string}.sentry.dev`
+  | `https://${string}.dev.getsentry.net:7999`;
 export type Origin = ProdOrigin | DevOrigin;
+
+const ORIGIN_PATTERNS = {
+  prod: [/^https:\/\/((?<orgSlug>[\w]*)\.)?(?<domain>sentry\.io)$/],
+  dev: [
+    /^https:\/\/((?<orgSlug>[\w]*)\.)?(?<domain>sentry\.dev)$/,
+    /^https:\/\/((?<orgSlug>[\w]*)\.)?(?<domain>dev\.getsentry\.net:7999)$/,
+  ],
+};
 
 /**
  * For example:
@@ -25,14 +33,10 @@ export type DevDomain =
 export type Domain = ProdDomain | DevDomain;
 
 const DOMAIN_PATTERNS = {
-  prod: [/^(?<domain>sentry\.io)$/],
-  dev: [/^(?<domain>sentry\.dev)$/, /^(?<domain>dev\.getsentry\.net:7999)$/],
-};
-const ORIGIN_PATTERNS = {
-  prod: [/^https:\/\/(?<orgSlug>.*)\.(?<domain>sentry\.io)\/$/],
+  prod: [/^((?<orgSlug>[\w]*)\.)?(?<domain>sentry\.io)$/],
   dev: [
-    /^https:\/\/(?<orgSlug>.*)\.(?<domain>sentry\.dev)\/$/,
-    /^https:\/\/(?<orgSlug>.*)\.(?<domain>dev\.getsentry\.net:7999)\/$/,
+    /^((?<orgSlug>[\w]*)\.)?(?<domain>sentry\.dev)$/,
+    /^((?<orgSlug>[\w]*)\.)?(?<domain>dev\.getsentry\.net:7999)$/,
   ],
 };
 
@@ -111,5 +115,9 @@ export function extractDomain(domainOrOrigin: string): Domain | undefined {
 }
 
 export function orgSlugToOrigin(orgSlug: string, domain: Domain): Origin {
-  return `https://${orgSlug}.${domain}/`;
+  return `https://${orgSlug}.${domain}`;
+}
+
+export function stripPort(domain: Domain): string {
+  return domain.replace(/:7999$/, '');
 }
