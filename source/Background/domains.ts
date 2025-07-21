@@ -11,10 +11,10 @@ export type DevOrigin =
 export type Origin = ProdOrigin | DevOrigin;
 
 const ORIGIN_PATTERNS = {
-  prod: [/^https:\/\/((?<orgSlug>[\w-]*)\.)?(?<domain>sentry\.io)$/],
+  prod: [/^https:\/\/((?<orgSlug>[^.]+)\.)?(?<domain>sentry\.io)$/],
   dev: [
-    /^https:\/\/((?<orgSlug>[\w-]*)\.)?(?<domain>sentry\.dev)$/,
-    /^https:\/\/((?<orgSlug>[\w-]*)\.)?(?<domain>dev\.getsentry\.net:7999)$/,
+    /^https:\/\/((?<orgSlug>[^.]+)\.)?(?<domain>sentry\.dev)$/,
+    /^https:\/\/((?<orgSlug>[^.]+)\.)?(?<domain>dev\.getsentry\.net:7999)$/,
   ],
 };
 
@@ -33,10 +33,10 @@ export type DevDomain =
 export type Domain = ProdDomain | DevDomain;
 
 const DOMAIN_PATTERNS = {
-  prod: [/^((?<orgSlug>[\w-]*)\.)?(?<domain>sentry\.io)$/],
+  prod: [/^((?<orgSlug>[^.]+)\.)?(?<domain>sentry\.io)$/],
   dev: [
-    /^((?<orgSlug>[\w-]*)\.)?(?<domain>sentry\.dev)$/,
-    /^((?<orgSlug>[\w-]*)\.)?(?<domain>dev\.getsentry\.net:7999)$/,
+    /^((?<orgSlug>[^.]+)\.)?(?<domain>sentry\.dev)$/,
+    /^((?<orgSlug>[^.]+)\.)?(?<domain>dev\.getsentry\.net:7999)$/,
   ],
 };
 
