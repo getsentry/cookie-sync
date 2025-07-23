@@ -49,10 +49,16 @@ export function isDevOrigin(maybeOrigin: string): maybeOrigin is DevOrigin {
 }
 
 export function isProdDomain(maybeDomain: string): maybeDomain is ProdDomain {
+  if (maybeDomain.startsWith('http://') || maybeDomain.startsWith('https://')) {
+    return false;
+  }
   return DOMAIN_PATTERNS.prod.some((pattern) => maybeDomain.match(pattern));
 }
 
 export function isDevDomain(maybeDomain: string): maybeDomain is DevDomain {
+  if (maybeDomain.startsWith('http://') || maybeDomain.startsWith('https://')) {
+    return false;
+  }
   return DOMAIN_PATTERNS.dev.some((pattern) => maybeDomain.match(pattern));
 }
 
@@ -83,32 +89,38 @@ function extractFromPatterns(
 }
 
 export function extractOrgSlug(domainOrOrigin: string): string | undefined {
-  if (isProdDomain(domainOrOrigin) || isDevDomain(domainOrOrigin)) {
-    return extractFromPatterns(domainOrOrigin, 'orgSlug', [
-      ...DOMAIN_PATTERNS.prod,
-      ...DOMAIN_PATTERNS.dev,
-    ]);
-  }
   if (isProdOrigin(domainOrOrigin) || isDevOrigin(domainOrOrigin)) {
+    console.log('extractOrgSlug: isProdOrigin or isDevOrigin', {
+      domainOrOrigin,
+    });
     return extractFromPatterns(domainOrOrigin, 'orgSlug', [
       ...ORIGIN_PATTERNS.prod,
       ...ORIGIN_PATTERNS.dev,
+    ]);
+  }
+  if (isProdDomain(domainOrOrigin) || isDevDomain(domainOrOrigin)) {
+    console.log('extractOrgSlug: isProdDomain or isDevDomain', {
+      domainOrOrigin,
+    });
+    return extractFromPatterns(domainOrOrigin, 'orgSlug', [
+      ...DOMAIN_PATTERNS.prod,
+      ...DOMAIN_PATTERNS.dev,
     ]);
   }
   return undefined;
 }
 
 export function extractDomain(domainOrOrigin: string): Domain | undefined {
-  if (isProdDomain(domainOrOrigin) || isDevDomain(domainOrOrigin)) {
-    return extractFromPatterns(domainOrOrigin, 'domain', [
-      ...DOMAIN_PATTERNS.prod,
-      ...DOMAIN_PATTERNS.dev,
-    ]);
-  }
   if (isProdOrigin(domainOrOrigin) || isDevOrigin(domainOrOrigin)) {
     return extractFromPatterns(domainOrOrigin, 'domain', [
       ...ORIGIN_PATTERNS.prod,
       ...ORIGIN_PATTERNS.dev,
+    ]);
+  }
+  if (isProdDomain(domainOrOrigin) || isDevDomain(domainOrOrigin)) {
+    return extractFromPatterns(domainOrOrigin, 'domain', [
+      ...DOMAIN_PATTERNS.prod,
+      ...DOMAIN_PATTERNS.dev,
     ]);
   }
   return undefined;

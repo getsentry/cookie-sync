@@ -119,6 +119,19 @@ class Storage {
     });
   };
 
+  removeOrg = async (orgSlug: string): Promise<void> => {
+    const prevOrgs = await this.getOrgs();
+    await localStorage.set({
+      orgs: prevOrgs.filter((org) => org !== orgSlug),
+    });
+  };
+
+  clearOrgs = async (): Promise<void> => {
+    await localStorage.set({
+      orgs: [...DEFAULT_ORGS],
+    });
+  };
+
   getCookieCache = async (): Promise<CookieCache> => {
     if (!this.cookieCache) {
       const all = await localStorage.get('cookies');

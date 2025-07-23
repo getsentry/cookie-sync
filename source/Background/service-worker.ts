@@ -102,15 +102,7 @@ async function findAndCacheData(): Promise<[void, void]> {
   return results;
 }
 
-async function setCookiesOnKnownOrgs(): Promise<
-  PromiseSettledResult<
-    | {
-        origin: string;
-        cookie: browser.Cookies.Cookie;
-      }
-    | undefined
-  >[]
-> {
+async function setCookiesOnKnownOrgs(): Promise<SyncNowResponse> {
   console.group('setCookiesOnKnownOrgs');
   const [knownOrgSlugs, targetDomains, cookieCache] = await Promise.all([
     Storage.getOrgs(),
@@ -135,7 +127,7 @@ async function setCookiesOnKnownOrgs(): Promise<
   const settled = await Promise.allSettled(
     targetOrigins.flatMap((targetOrigin) =>
       cookieStores.flatMap((store) =>
-        cookieList.map(({cookie}) =>
+        cookieList.flatMap(({cookie}) =>
           setTargetCookie(targetOrigin, cookie, store)
         )
       )
@@ -203,6 +195,11 @@ async function onMessage(
   }
   console.group(`Received "${request.command}" command`);
   switch (request.command) {
+    case 'find-and-cache-data': {
+      await findAndCacheData();
+      console.groupEnd();
+      return true;
+    }
     case 'sync-now': {
       await findAndCacheData();
 

@@ -3,6 +3,7 @@ import * as React from 'react';
 import Storage from '../Background/storage';
 
 import './domainsEnabled.css';
+import KnownOrgs from './KnownOrgs';
 
 // eslint-disable-next-line
 type SyncDomains = Awaited<ReturnType<typeof Storage.getDomains>>;
@@ -59,7 +60,7 @@ export default function DomainsEnabled() {
   return (
     <section className="domainsEnabled-grid">
       <div>
-        <h2>Sync From</h2>
+        <h2>Sync From Domain:</h2>
         <ul>
           <ListItem
             domain={{domain: 'sentry.io', syncEnabled: true}}
@@ -69,7 +70,7 @@ export default function DomainsEnabled() {
         </ul>
       </div>
       <div>
-        <h2>Sync To</h2>
+        <h2>Sync To Domains:</h2>
         <ul>
           {domains?.map((domain) => (
             <ListItem
@@ -80,6 +81,7 @@ export default function DomainsEnabled() {
           ))}
         </ul>
       </div>
+      <KnownOrgs />
     </section>
   );
 }
