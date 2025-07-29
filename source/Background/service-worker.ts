@@ -4,6 +4,7 @@ import {
   Domain,
   extractDomain,
   extractOrgSlug,
+  isDevOrigin,
   isProdDomain,
   isProdOrigin,
   orgSlugToOrigin,
@@ -102,15 +103,7 @@ async function findAndCacheData(): Promise<[void, void]> {
   return results;
 }
 
-async function setCookiesOnKnownOrgs(): Promise<
-  PromiseSettledResult<
-    | {
-        origin: string;
-        cookie: browser.Cookies.Cookie;
-      }
-    | undefined
-  >[]
-> {
+async function setCookiesOnKnownOrgs(): Promise<SyncNowResponse> {
   console.group('setCookiesOnKnownOrgs');
   const [knownOrgSlugs, targetDomains, cookieCache] = await Promise.all([
     Storage.getOrgs(),
@@ -135,7 +128,7 @@ async function setCookiesOnKnownOrgs(): Promise<
   const settled = await Promise.allSettled(
     targetOrigins.flatMap((targetOrigin) =>
       cookieStores.flatMap((store) =>
-        cookieList.map(({cookie}) =>
+        cookieList.flatMap(({cookie}) =>
           setTargetCookie(targetOrigin, cookie, store)
         )
       )
@@ -179,17 +172,29 @@ async function onTabUpdated(
   tab: Tabs.Tab
 ): Promise<void> {
   const origin = toUrl(tab.url)?.origin as Origin;
-  if (!origin || !isProdOrigin(origin)) {
+  if (!origin) {
     return;
   }
-  console.group('Received onTabUpdated', {changeInfo});
 
-  const origins = tabsToOrigins([tab]);
-  await Promise.all([saveFoundOrgs(origins), saveProdCookies(origins)]);
+  if (isDevOrigin(origin)) {
+    console.group('Received onTabUpdated (dev)', {changeInfo});
 
-  const results = await setCookiesOnKnownOrgs();
-  debugResults('Tab did update', results);
-  console.groupEnd();
+    const results = await setCookiesOnKnownOrgs();
+    debugResults('Tab did update', results);
+
+    console.groupEnd();
+  }
+
+  if (isProdOrigin(origin)) {
+    console.group('Received onTabUpdated (prod)', {changeInfo});
+
+    const origins = tabsToOrigins([tab]);
+    await Promise.all([saveFoundOrgs(origins), saveProdCookies(origins)]);
+
+    const results = await setCookiesOnKnownOrgs();
+    debugResults('Tab did update', results);
+    console.groupEnd();
+  }
 }
 
 /**
@@ -203,6 +208,11 @@ async function onMessage(
   }
   console.group(`Received "${request.command}" command`);
   switch (request.command) {
+    case 'find-and-cache-data': {
+      await findAndCacheData();
+      console.groupEnd();
+      return true;
+    }
     case 'sync-now': {
       await findAndCacheData();
 

@@ -12,7 +12,7 @@ input[disabled] {
 }
 
 #popup {
-  min-width: 450px;
+  min-width: 550px;
   padding: 20px 20px;
 }
 
@@ -44,7 +44,6 @@ h1 {
 .dev-ui-button {
   border-radius: 4px;
   display: inline-block;
-  border-radius: 4px;
   text-transform: none;
   font-weight: 600;
   color: #FFFFFF;
@@ -56,6 +55,14 @@ h1 {
   padding-block: 8px;
   cursor: pointer;
   margin-bottom: 10px;
+}
+.dev-ui-button.small {
+  font-size: 1em;
+  border-radius: 2px;
+  height: auto;
+  padding-inline: 6px;
+  padding-block: 0px;
+  margin-bottom: 0;
 }
 
 .copy-button {

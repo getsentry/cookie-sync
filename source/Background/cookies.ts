@@ -1,6 +1,6 @@
 import browser, {Cookies} from 'webextension-polyfill';
 import uniq from '../utils/uniq';
-import {extractDomain, extractOrgSlug, stripPort} from './domains';
+import {extractDomain, extractOrgSlug, originToDomain, stripOrgSlug, stripPort} from './domains';
 import type {Origin} from './domains';
 
 const cookieNames: ReadonlyArray<string> = [
@@ -66,20 +66,9 @@ export async function setTargetCookie(
     }
   | undefined
 > {
-  const orgSlug = extractOrgSlug(targetOrigin);
-  const domain = extractDomain(targetOrigin);
-  if (!orgSlug) {
-    console.log('setTargetCookie: no orgSlug found', {targetOrigin});
-    return undefined;
-  }
-  if (!domain) {
-    console.log('setTargetCookie: no domain found', {targetOrigin});
-    return undefined;
-  }
-
   const details: browser.Cookies.SetDetailsType = {
-    url: `${targetOrigin}`,
-    domain: `${orgSlug}.${stripPort(domain)}`,
+    url: targetOrigin,
+    domain: stripPort(stripOrgSlug(originToDomain(targetOrigin))),
     expirationDate: cookie.expirationDate,
     httpOnly: cookie.httpOnly,
     name: cookie.name,

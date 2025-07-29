@@ -4,17 +4,17 @@
  *
  * https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Origin
  */
-export type ProdOrigin = `https://${string}.sentry.io`;
+export type ProdOrigin = `https://sentry.io` | `https://${string}.sentry.io`;
 export type DevOrigin =
   | `https://${string}.sentry.dev`
   | `https://${string}.dev.getsentry.net:7999`;
 export type Origin = ProdOrigin | DevOrigin;
 
 const ORIGIN_PATTERNS = {
-  prod: [/^https:\/\/((?<orgSlug>[\w]*)\.)?(?<domain>sentry\.io)$/],
+  prod: [/^https:\/\/((?<orgSlug>[^.]+)\.)?(?<domain>sentry\.io)$/],
   dev: [
-    /^https:\/\/((?<orgSlug>[\w]*)\.)?(?<domain>sentry\.dev)$/,
-    /^https:\/\/((?<orgSlug>[\w]*)\.)?(?<domain>dev\.getsentry\.net:7999)$/,
+    /^https:\/\/([^.]+\.)?(?<domain>sentry\.dev)$/,
+    /^https:\/\/((?<orgSlug>[^.]+)\.)?(?<domain>dev\.getsentry\.net:7999)$/,
   ],
 };
 
@@ -33,10 +33,10 @@ export type DevDomain =
 export type Domain = ProdDomain | DevDomain;
 
 const DOMAIN_PATTERNS = {
-  prod: [/^((?<orgSlug>[\w]*)\.)?(?<domain>sentry\.io)$/],
+  prod: [/^((?<orgSlug>[^.]+)\.)?(?<domain>sentry\.io)$/],
   dev: [
-    /^((?<orgSlug>[\w]*)\.)?(?<domain>sentry\.dev)$/,
-    /^((?<orgSlug>[\w]*)\.)?(?<domain>dev\.getsentry\.net:7999)$/,
+    /^([^.]+\.)?(?<domain>sentry\.dev)$/,
+    /^((?<orgSlug>[^.]+)\.)?(?<domain>dev\.getsentry\.net:7999)$/,
   ],
 };
 
@@ -49,10 +49,16 @@ export function isDevOrigin(maybeOrigin: string): maybeOrigin is DevOrigin {
 }
 
 export function isProdDomain(maybeDomain: string): maybeDomain is ProdDomain {
+  if (maybeDomain.startsWith('http://') || maybeDomain.startsWith('https://')) {
+    return false;
+  }
   return DOMAIN_PATTERNS.prod.some((pattern) => maybeDomain.match(pattern));
 }
 
 export function isDevDomain(maybeDomain: string): maybeDomain is DevDomain {
+  if (maybeDomain.startsWith('http://') || maybeDomain.startsWith('https://')) {
+    return false;
+  }
   return DOMAIN_PATTERNS.dev.some((pattern) => maybeDomain.match(pattern));
 }
 
@@ -83,39 +89,69 @@ function extractFromPatterns(
 }
 
 export function extractOrgSlug(domainOrOrigin: string): string | undefined {
-  if (isProdDomain(domainOrOrigin) || isDevDomain(domainOrOrigin)) {
-    return extractFromPatterns(domainOrOrigin, 'orgSlug', [
-      ...DOMAIN_PATTERNS.prod,
-      ...DOMAIN_PATTERNS.dev,
-    ]);
-  }
   if (isProdOrigin(domainOrOrigin) || isDevOrigin(domainOrOrigin)) {
     return extractFromPatterns(domainOrOrigin, 'orgSlug', [
       ...ORIGIN_PATTERNS.prod,
       ...ORIGIN_PATTERNS.dev,
+    ]);
+  }
+  if (isProdDomain(domainOrOrigin) || isDevDomain(domainOrOrigin)) {
+    return extractFromPatterns(domainOrOrigin, 'orgSlug', [
+      ...DOMAIN_PATTERNS.prod,
+      ...DOMAIN_PATTERNS.dev,
     ]);
   }
   return undefined;
 }
 
 export function extractDomain(domainOrOrigin: string): Domain | undefined {
-  if (isProdDomain(domainOrOrigin) || isDevDomain(domainOrOrigin)) {
-    return extractFromPatterns(domainOrOrigin, 'domain', [
-      ...DOMAIN_PATTERNS.prod,
-      ...DOMAIN_PATTERNS.dev,
-    ]);
-  }
   if (isProdOrigin(domainOrOrigin) || isDevOrigin(domainOrOrigin)) {
     return extractFromPatterns(domainOrOrigin, 'domain', [
       ...ORIGIN_PATTERNS.prod,
       ...ORIGIN_PATTERNS.dev,
     ]);
   }
+  if (isProdDomain(domainOrOrigin) || isDevDomain(domainOrOrigin)) {
+    return extractFromPatterns(domainOrOrigin, 'domain', [
+      ...DOMAIN_PATTERNS.prod,
+      ...DOMAIN_PATTERNS.dev,
+    ]);
+  }
   return undefined;
 }
 
 export function orgSlugToOrigin(orgSlug: string, domain: Domain): Origin {
-  return `https://${orgSlug}.${domain}`;
+  switch (domain) {
+    case 'sentry.io':
+    case 'sentry.dev':
+    case 'dev.getsentry.net:7999':
+      return `https://${orgSlug}.${domain}`;
+    default:
+      return `https://${domain}`;
+  }
+}
+
+export function originToDomain(origin: Origin): Domain {
+  if (isProdOrigin(origin)) {
+    return origin.replace('https://', '') as ProdDomain;
+  }
+  if (isDevOrigin(origin)) {
+    return origin.replace('https://', '') as DevDomain;
+  }
+  throw new Error(`Unknown origin: ${origin}`);
+}
+
+export function stripOrgSlug(domain: Domain): Domain {
+  if (domain.endsWith('.sentry.io')) {
+    return 'sentry.io';
+  }
+  if (domain.endsWith('.sentry.dev')) {
+    return 'sentry.dev';
+  }
+  if (domain.endsWith('.dev.getsentry.net:7999')) {
+    return 'dev.getsentry.net:7999';
+  }
+  return domain;
 }
 
 export function stripPort(domain: Domain): string {

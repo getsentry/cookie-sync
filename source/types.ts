@@ -1,7 +1,7 @@
 import type {Cookies} from 'webextension-polyfill';
 
 export type Message = {
-  command: 'sync-now' | 'storage-clear';
+  command: 'find-and-cache-data' | 'sync-now' | 'storage-clear';
 };
 
 export type SyncNowResponse = PromiseSettledResult<

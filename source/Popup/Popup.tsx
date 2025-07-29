@@ -16,6 +16,7 @@ export default function Popup() {
       <h1>Cookie Sync</h1>
 
       <DomainsEnabled />
+
       <div
         style={{
           display: 'flex',

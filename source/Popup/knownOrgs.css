@@ -1,0 +1,17 @@
+.knownOrgs-grid {
+  margin-bottom: 10px;
+}
+
+.knownOrgs-grid h2 {
+  font-weight: bold;
+}
+
+.knownOrgs-grid ul {
+  display: grid;
+  grid-template-columns: 1fr max-content;
+  gap: 2px 4px;
+}
+
+.knownOrgs-grid ul li {
+  display: contents;
+}
