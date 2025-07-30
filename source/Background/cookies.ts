@@ -1,6 +1,6 @@
 import browser, {Cookies} from 'webextension-polyfill';
 import uniq from '../utils/uniq';
-import {extractDomain, extractOrgSlug, originToDomain, stripOrgSlug, stripPort} from './domains';
+import {originToDomain, stripOrgSlug, stripPort} from './domains';
 import type {Origin} from './domains';
 
 const cookieNames: ReadonlyArray<string> = [
