@@ -157,4 +157,4 @@ Firefox Addon Page:
 
 ## License
 
-[MIT ©](https://github.com/getsentry/cookie-sync/blob/main/LICENCE)
+[MIT ©](https://github.com/getsentry/cookie-sync/blob/main/LICENSE)
