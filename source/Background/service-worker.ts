@@ -1,4 +1,4 @@
-import browser, {Cookies, Tabs} from 'webextension-polyfill';
+import { browser, type Browser } from "wxt/browser";
 
 import {
   Domain,
@@ -9,36 +9,38 @@ import {
   isProdOrigin,
   orgSlugToOrigin,
   Origin,
-} from './domains';
-import {findOpenDevUITabs, findOpenProdTabs, tabsToOrigins} from './tabs';
-import {getCookiesByOrigin, isKnownCookie, setTargetCookie} from './cookies';
-import Storage from './storage';
-import toUrl from '../utils/toUrl';
-import uniq from '../utils/uniq';
-import uniqBy from '../utils/uniqBy';
+} from "./domains";
+import { findOpenDevUITabs, findOpenProdTabs, tabsToOrigins } from "./tabs";
+import { getCookiesByOrigin, isKnownCookie, setTargetCookie } from "./cookies";
+import Storage from "./storage";
+import toUrl from "../utils/toUrl";
+import uniq from "../utils/uniq";
+import uniqBy from "../utils/uniqBy";
 
-import type {Message, StorageClearResponse, SyncNowResponse} from '../types';
+import type { Message, StorageClearResponse, SyncNowResponse } from "../types";
+
+type MessageResponse = SyncNowResponse | StorageClearResponse | false;
 
 function debugResults(
   event: string,
   results: PromiseSettledResult<
     | {
         origin: string;
-        cookie: browser.Cookies.Cookie;
+        cookie: Browser.cookies.Cookie;
       }
     | undefined
-  >[]
+  >[],
 ) {
   console.log(event);
   console.table(
     results.map((result) => {
-      const value = result.status === 'fulfilled' ? result.value : result;
+      const value = result.status === "fulfilled" ? result.value : result;
       return {
         status: result.status,
         reason: null,
         ...value,
       };
-    })
+    }),
   );
 }
 
@@ -47,7 +49,7 @@ function debugResults(
  */
 async function saveFoundOrgs(origins: Origin[]): Promise<void> {
   const orgSlugs = uniq(origins.map(extractOrgSlug).filter(Boolean));
-  console.log('saveFoundOrgs', {origins, orgSlugs});
+  console.log("saveFoundOrgs", { origins, orgSlugs });
   return Storage.saveOrg(orgSlugs);
 }
 
@@ -64,8 +66,8 @@ async function saveProdCookies(prodOrigins: Origin[]): Promise<void> {
   // Insert those cookies into storage so we can use them even if the prod tabs
   // get closed and we can't read them fresh again.
   const cookieCache = await Storage.getCookieCache();
-  console.group('saveProdCookies');
-  console.log('saving cookies...', {
+  console.group("saveProdCookies");
+  console.log("saving cookies...", {
     prodOrigins,
     uniqOrigins,
     prodCookiesByOrigin,
@@ -76,9 +78,9 @@ async function saveProdCookies(prodOrigins: Origin[]): Promise<void> {
       const domain = extractDomain(origin);
       if (domain) {
         cookieCache.insert(domain, cookie);
-        console.log('inserted', {origin, domain, cookie});
+        console.log("inserted", { origin, domain, cookie });
       }
-    })
+    }),
   );
   console.groupEnd();
   return cookieCache.save();
@@ -88,12 +90,12 @@ async function saveProdCookies(prodOrigins: Origin[]): Promise<void> {
  * Read open tabs and save the orgs and cookies that we find
  */
 async function findAndCacheData(): Promise<[void, void]> {
-  console.group('findAndCacheData');
+  console.group("findAndCacheData");
   const [openDevTabs, openProdTabs] = await Promise.all([
     findOpenDevUITabs(),
     findOpenProdTabs(),
   ]);
-  console.log('found tabs', {openDevTabs, openProdTabs});
+  console.log("found tabs", { openDevTabs, openProdTabs });
 
   const results = await Promise.all([
     saveFoundOrgs(tabsToOrigins([...openDevTabs, ...openProdTabs])),
@@ -104,7 +106,7 @@ async function findAndCacheData(): Promise<[void, void]> {
 }
 
 async function setCookiesOnKnownOrgs(): Promise<SyncNowResponse> {
-  console.group('setCookiesOnKnownOrgs');
+  console.group("setCookiesOnKnownOrgs");
   const [knownOrgSlugs, targetDomains, cookieCache] = await Promise.all([
     Storage.getOrgs(),
     Storage.getDomains(),
@@ -114,10 +116,10 @@ async function setCookiesOnKnownOrgs(): Promise<SyncNowResponse> {
   const targetOrigins = knownOrgSlugs.flatMap((orgSlug) =>
     targetDomains
       .filter((domain) => domain.syncEnabled)
-      .map((domain) => orgSlugToOrigin(orgSlug, domain.domain))
+      .map((domain) => orgSlugToOrigin(orgSlug, domain.domain)),
   );
 
-  console.log('setting cookies onto', {
+  console.log("setting cookies onto", {
     knownOrgSlugs,
     targetDomains,
     targetOrigins,
@@ -128,11 +130,11 @@ async function setCookiesOnKnownOrgs(): Promise<SyncNowResponse> {
   const settled = await Promise.allSettled(
     targetOrigins.flatMap((targetOrigin) =>
       cookieStores.flatMap((store) =>
-        cookieList.flatMap(({cookie}) =>
-          setTargetCookie(targetOrigin, cookie, store)
-        )
-      )
-    )
+        cookieList.flatMap(({ cookie }) =>
+          setTargetCookie(targetOrigin, cookie, store),
+        ),
+      ),
+    ),
   );
   console.groupEnd();
   return settled;
@@ -149,27 +151,27 @@ async function setCookiesOnKnownOrgs(): Promise<SyncNowResponse> {
  * @param changeInfo
  */
 async function onCookieChanged(
-  changeInfo: Cookies.OnChangedChangeInfoType
+  changeInfo: Browser.cookies.CookieChangeInfo,
 ): Promise<void> {
-  const {cookie} = changeInfo;
+  const { cookie } = changeInfo;
   if (!isProdDomain(cookie.domain) || !isKnownCookie(cookie.name)) {
     return;
   }
-  console.group('Received onCookieChanged', {changeInfo});
+  console.group("Received onCookieChanged", { changeInfo });
 
   const cookieCache = await Storage.getCookieCache();
   cookieCache.insert(cookie.domain as Domain, cookie);
   await cookieCache.save();
 
   const results = await setCookiesOnKnownOrgs();
-  debugResults('Cookie did update', results);
+  debugResults("Cookie did update", results);
   console.groupEnd();
 }
 
 async function onTabUpdated(
   _tabId: number,
-  changeInfo: Tabs.OnUpdatedChangeInfoType,
-  tab: Tabs.Tab
+  changeInfo: Browser.tabs.OnUpdatedInfo,
+  tab: Browser.tabs.Tab,
 ): Promise<void> {
   const origin = toUrl(tab.url)?.origin as Origin;
   if (!origin) {
@@ -177,22 +179,22 @@ async function onTabUpdated(
   }
 
   if (isDevOrigin(origin)) {
-    console.group('Received onTabUpdated (dev)', {changeInfo});
+    console.group("Received onTabUpdated (dev)", { changeInfo });
 
     const results = await setCookiesOnKnownOrgs();
-    debugResults('Tab did update', results);
+    debugResults("Tab did update", results);
 
     console.groupEnd();
   }
 
   if (isProdOrigin(origin)) {
-    console.group('Received onTabUpdated (prod)', {changeInfo});
+    console.group("Received onTabUpdated (prod)", { changeInfo });
 
     const origins = tabsToOrigins([tab]);
     await Promise.all([saveFoundOrgs(origins), saveProdCookies(origins)]);
 
     const results = await setCookiesOnKnownOrgs();
-    debugResults('Tab did update', results);
+    debugResults("Tab did update", results);
     console.groupEnd();
   }
 }
@@ -200,30 +202,28 @@ async function onTabUpdated(
 /**
  * When we get a message from the browser, read out the command, exec it and return the result
  */
-async function onMessage(
-  request: Message
-): Promise<SyncNowResponse | StorageClearResponse | false> {
+async function handleMessage(request: Message): Promise<MessageResponse> {
   if (!request.command) {
     return false;
   }
   console.group(`Received "${request.command}" command`);
   switch (request.command) {
-    case 'find-and-cache-data': {
+    case "find-and-cache-data": {
       await findAndCacheData();
       console.groupEnd();
       return true;
     }
-    case 'sync-now': {
+    case "sync-now": {
       await findAndCacheData();
 
       const results = await setCookiesOnKnownOrgs();
-      debugResults('Sync complete', results);
+      debugResults("Sync complete", results);
       console.groupEnd();
       const stores = await browser.cookies.getAllCookieStores();
-      console.log('cookie stores', stores);
+      console.log("cookie stores", stores);
       return results;
     }
-    case 'storage-clear':
+    case "storage-clear":
       await Storage.clear();
       console.groupEnd();
       return true;
@@ -234,20 +234,33 @@ async function onMessage(
 }
 
 /**
- * Service-worker entrypoint.
+ * Bridge async message handling to the callback-based runtime API exposed by WXT.
  */
-(async function init() {
+function onMessage(
+  request: Message,
+  _sender: Browser.runtime.MessageSender,
+  sendResponse: (response: MessageResponse) => void,
+): true {
+  void handleMessage(request)
+    .then(sendResponse)
+    .catch((error: unknown) => {
+      console.error("Error handling runtime message", error);
+      sendResponse(false);
+    });
+
+  return true;
+}
+
+export async function initBackground(): Promise<void> {
   console.clear();
   Storage.clear();
-  console.info('Cookie Sync Service Worker is starting...');
+  console.info("Cookie Sync Service Worker is starting...");
 
   browser.cookies.onChanged.addListener(onCookieChanged);
   browser.tabs.onUpdated.addListener(onTabUpdated);
   browser.runtime.onMessage.addListener(onMessage);
 
-  await onMessage({command: 'sync-now'});
+  await handleMessage({ command: "sync-now" });
 
   await Storage.debug();
-})();
-
-export {};
+}

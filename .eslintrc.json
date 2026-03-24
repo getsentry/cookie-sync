@@ -1,42 +1,65 @@
 {
-	"extends": [
-		"@abhijithvijayan/eslint-config/typescript",
-		"@abhijithvijayan/eslint-config/node",
-		"@abhijithvijayan/eslint-config/react"
-	],
-	"parserOptions": {
-		"project": [
-			"./tsconfig.json"
-		],
-		"sourceType": "module"
-	},
-	"rules": {
-		"no-console": "off",
-		"no-extend-native": "off",
-		"react/jsx-props-no-spreading": "off",
-		"jsx-a11y/label-has-associated-control": "off",
-		"class-methods-use-this": "off",
-		"max-classes-per-file": "off",
-		"node/no-missing-import": "off",
-		"node/no-unpublished-import": "off",
-		"node/no-unsupported-features/es-syntax": ["error", {
-			"ignores": ["modules"]
-		}],
-		"@typescript-eslint/explicit-function-return-type": "off",
-		"@typescript-eslint/explicit-module-boundary-types": "off",
-		"@typescript-eslint/no-unused-vars": ["error", {
-			"argsIgnorePattern": "^_",
-			"caughtErrorsIgnorePattern": "^-",
-			"varsIgnorePattern": "^_"
-		}]
-
-	},
-	"env": {
-		"webextensions": true
-	},
-	"settings": {
-		"node": {
-			"tryExtensions": [".tsx"] // append tsx to the list as well
-		}
-	}
+  "root": true,
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "webextensions": true
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": ["./tsconfig.json"],
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "plugins": [
+    "@typescript-eslint",
+    "import",
+    "jsx-a11y",
+    "prettier",
+    "react",
+    "react-hooks"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:jsx-a11y/recommended",
+    "plugin:prettier/recommended"
+  ],
+  "rules": {
+    "no-console": "off",
+    "no-extend-native": "off",
+    "react/react-in-jsx-scope": "off",
+    "react/jsx-props-no-spreading": "off",
+    "react/prop-types": "off",
+    "jsx-a11y/label-has-associated-control": "off",
+    "class-methods-use-this": "off",
+    "max-classes-per-file": "off",
+    "import/no-unresolved": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }
+    ]
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "ignorePatterns": [
+    ".output/",
+    ".wxt/",
+    "node_modules/",
+    "postcss.config.js",
+    "public/assets/"
+  ]
 }

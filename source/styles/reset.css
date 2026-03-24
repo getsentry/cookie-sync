@@ -1,4 +1,4 @@
-@import '../../node_modules/advanced-css-reset/dist/reset.css';
+@import "../../node_modules/advanced-css-reset/dist/reset.css";
 
 * {
   margin: 0;

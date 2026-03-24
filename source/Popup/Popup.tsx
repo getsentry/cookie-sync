@@ -1,16 +1,16 @@
-import * as React from 'react';
-import browser from 'webextension-polyfill';
+import * as React from "react";
+import { browser } from "wxt/browser";
 
-import DomainsEnabled from './DomainsEnabled';
-import FailedIcon from '../icons/FailedIcon';
-import ResultList from './ResultList';
-import useSyncNow from '../useSyncNow';
-import VersionBadge from './VersionBadge';
+import DomainsEnabled from "./DomainsEnabled";
+import FailedIcon from "../icons/FailedIcon";
+import ResultList from "./ResultList";
+import useSyncNow from "../useSyncNow";
+import VersionBadge from "./VersionBadge";
 
-import './popup.css';
+import "./popup.css";
 
 export default function Popup() {
-  const {results, isLoading, error, syncNow} = useSyncNow();
+  const { results, isLoading, error, syncNow } = useSyncNow();
 
   return (
     <section id="popup">
@@ -20,10 +20,10 @@ export default function Popup() {
 
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '8px',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "8px",
         }}
       >
         <button
@@ -39,21 +39,21 @@ export default function Popup() {
           className="dev-ui-button"
           onClick={() => {
             browser.tabs
-              .query({currentWindow: true, active: true})
+              .query({ currentWindow: true, active: true })
               .then((tabs) => {
                 const tab = tabs[0];
                 if (!tab) {
-                  throw new Error('No active tab');
+                  throw new Error("No active tab");
                 }
 
                 const newUrl = tab.url?.replace(
-                  'sentry.io',
-                  'dev.getsentry.net:7999'
+                  "sentry.io",
+                  "dev.getsentry.net:7999",
                 );
-                return browser.tabs.create({url: newUrl});
+                return browser.tabs.create({ url: newUrl });
               })
               .catch((e: unknown) => {
-                console.error('Error opening new tab', e);
+                console.error("Error opening new tab", e);
               });
           }}
         >

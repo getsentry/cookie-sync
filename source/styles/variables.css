@@ -5,16 +5,16 @@
   --skyBlue: #8892b0;
 
   /* DarkTheme Colors from theme.tsx from sentry */
-  --surface100: #1A141F;
+  --surface100: #1a141f;
 
-  --gray500: #EBE6EF;
-  --gray400: #D6D0DC;
-  --gray300: #998DA5;
-  --gray200: #43384C;
-  --gray100: #342B3B;
+  --gray500: #ebe6ef;
+  --gray400: #d6d0dc;
+  --gray300: #998da5;
+  --gray200: #43384c;
+  --gray100: #342b3b;
 
-  --red400: #F32F35;
-  --red300: #F55459;
+  --red400: #f32f35;
+  --red300: #f55459;
 
-  --green400: #26B593;
+  --green400: #26b593;
 }

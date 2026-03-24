@@ -1,8 +1,8 @@
-import * as React from 'react';
+import * as React from "react";
 
-import FailedIcon from '../icons/FailedIcon';
+import FailedIcon from "../icons/FailedIcon";
 
-import useSyncNow from '../useSyncNow';
+import useSyncNow from "../useSyncNow";
 
 function Styles() {
   return (
@@ -78,7 +78,7 @@ function Styles() {
 }
 
 export default function Banner() {
-  const {syncNow, error} = useSyncNow();
+  const { syncNow, error } = useSyncNow();
 
   return (
     <React.Fragment>
@@ -89,7 +89,7 @@ export default function Banner() {
             type="button"
             className="sync-button"
             onClick={async () => {
-              const {results, error: err} = await syncNow();
+              const { results, error: err } = await syncNow();
               if (!err && results?.length) {
                 const target = `${window.location.origin}/`;
                 window.location.href = target;

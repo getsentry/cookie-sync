@@ -1,23 +1,23 @@
-import * as React from 'react';
-import ReactDOM from 'react-dom';
+import * as React from "react";
+import ReactDOM from "react-dom";
 
-import Banner from './Banner';
+import Banner from "./Banner";
 
 function onReady(fn: () => void) {
-  if (['complete', 'interactive'].includes(document.readyState)) {
+  if (["complete", "interactive"].includes(document.readyState)) {
     setTimeout(fn, 1);
   } else {
-    document.addEventListener('DOMContentLoaded', fn);
+    document.addEventListener("DOMContentLoaded", fn);
   }
 }
 
-onReady(() => {
-  const reactRoot = document.createElement('div');
+export function mountContentScript(): void {
+  onReady(() => {
+    const reactRoot = document.createElement("div");
 
-  const body = document.querySelector('body');
-  body?.appendChild(reactRoot);
+    const body = document.querySelector("body");
+    body?.appendChild(reactRoot);
 
-  ReactDOM.render(React.createElement(Banner, null, null), reactRoot);
-});
-
-export {};
+    ReactDOM.render(React.createElement(Banner, null, null), reactRoot);
+  });
+}

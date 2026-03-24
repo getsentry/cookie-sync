@@ -1,10 +1,10 @@
-import * as React from 'react';
-import browser from 'webextension-polyfill';
+import * as React from "react";
+import { browser } from "wxt/browser";
 
-import Storage from '../Background/storage';
+import Storage from "../Background/storage";
 
-import './knownOrgs.css';
-import type {Message} from '../types';
+import "./knownOrgs.css";
+import type { Message } from "../types";
 
 export default function KnownOrgs() {
   const [orgs, setOrgs] = React.useState<string[]>([]);
@@ -21,11 +21,11 @@ export default function KnownOrgs() {
           <button
             type="button"
             className="dev-ui-button small"
-            style={{float: 'right'}}
+            style={{ float: "right" }}
             onClick={() => {
               browser.runtime
                 .sendMessage({
-                  command: 'find-and-cache-data',
+                  command: "find-and-cache-data",
                 } as Message)
                 .then(refreshOrgs);
             }}

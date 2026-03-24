@@ -1,9 +1,9 @@
-import * as React from 'react';
+import * as React from "react";
 
-import Storage from '../Background/storage';
+import Storage from "../Background/storage";
 
-import './domainsEnabled.css';
-import KnownOrgs from './KnownOrgs';
+import "./domainsEnabled.css";
+import KnownOrgs from "./KnownOrgs";
 
 // eslint-disable-next-line
 type SyncDomains = Awaited<ReturnType<typeof Storage.getDomains>>;
@@ -30,7 +30,7 @@ function ListItem({
 }: {
   domain: SyncDomains[number];
   disabled?: boolean;
-  refreshDomains: ReturnType<typeof useDomainsEnabled>['refreshDomains'];
+  refreshDomains: ReturnType<typeof useDomainsEnabled>["refreshDomains"];
 }) {
   return (
     <li>
@@ -55,7 +55,7 @@ function ListItem({
 }
 
 export default function DomainsEnabled() {
-  const {domains, refreshDomains} = useDomainsEnabled();
+  const { domains, refreshDomains } = useDomainsEnabled();
 
   return (
     <section className="domainsEnabled-grid">
@@ -63,7 +63,7 @@ export default function DomainsEnabled() {
         <h2>Sync From Domain:</h2>
         <ul>
           <ListItem
-            domain={{domain: 'sentry.io', syncEnabled: true}}
+            domain={{ domain: "sentry.io", syncEnabled: true }}
             disabled={true}
             refreshDomains={refreshDomains}
           />

@@ -170,9 +170,6 @@ typings/
 # nuxt.js build output
 .nuxt
 
-# react / gatsby 
-public/
-
 # vuepress build output
 .vuepress/dist
 
@@ -195,6 +192,9 @@ public/
 extension/
 dist/
 .awcache
+.output/
+.addfox/
+.wxt/
 
 # yarn 2
 # https://github.com/yarnpkg/berry/issues/454#issuecomment-530312089
