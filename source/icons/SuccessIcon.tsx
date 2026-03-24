@@ -1,5 +1,5 @@
-import * as React from 'react';
-import {forwardRef} from 'react';
+import * as React from "react";
+import { forwardRef } from "react";
 
 export default forwardRef<SVGSVGElement, React.SVGAttributes<SVGSVGElement>>(
   function FailedIcon(props, ref) {
@@ -20,5 +20,5 @@ export default forwardRef<SVGSVGElement, React.SVGAttributes<SVGSVGElement>>(
         />
       </svg>
     );
-  }
+  },
 );

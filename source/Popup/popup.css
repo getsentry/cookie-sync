@@ -28,9 +28,9 @@ h1 {
   border-radius: 4px;
   text-transform: none;
   font-weight: 600;
-  color: #FFFFFF;
-  background-color: #7669D3;
-  border: 1px solid #7669D3;
+  color: #ffffff;
+  background-color: #7669d3;
+  border: 1px solid #7669d3;
   height: 34px;
   font-size: 0.875rem;
   line-height: 1rem;
@@ -46,7 +46,7 @@ h1 {
   display: inline-block;
   text-transform: none;
   font-weight: 600;
-  color: #FFFFFF;
+  color: #ffffff;
   background-color: rgba(255, 255, 255, 0.1);
   height: 34px;
   font-size: 0.875rem;
@@ -70,9 +70,9 @@ h1 {
   display: inline-block;
   border-radius: 4px;
   text-transform: none;
-  color: #FFFFFF;
-  background-color: #7669D3;
-  border: 1px solid #7669D3;
+  color: #ffffff;
+  background-color: #7669d3;
+  border: 1px solid #7669d3;
   font-size: 0.875rem;
   line-height: 1rem;
   padding-inline: 6px;
@@ -116,7 +116,6 @@ h1 {
   color: white;
 }
 
-
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -131,9 +130,9 @@ h1 {
   width: 18px;
   height: 18px;
   border-radius: 18px;
-  border-top: 2px solid #DBD6E1;
-  border-right: 2px solid #DBD6E1;
-  border-bottom: 2px solid #DBD6E1;
-  border-left: 2px solid #6C5FC7;
+  border-top: 2px solid #dbd6e1;
+  border-right: 2px solid #dbd6e1;
+  border-bottom: 2px solid #dbd6e1;
+  border-left: 2px solid #6c5fc7;
   margin-left: auto;
 }

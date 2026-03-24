@@ -1,13 +1,13 @@
-import type {Cookies} from 'webextension-polyfill';
+import type { Browser } from "wxt/browser";
 
 export type Message = {
-  command: 'find-and-cache-data' | 'sync-now' | 'storage-clear';
+  command: "find-and-cache-data" | "sync-now" | "storage-clear";
 };
 
 export type SyncNowResponse = PromiseSettledResult<
   | {
       origin: string;
-      cookie: Cookies.Cookie;
+      cookie: Browser.cookies.Cookie;
     }
   | undefined
 >[];

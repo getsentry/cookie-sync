@@ -1,26 +1,26 @@
-import * as React from 'react';
-import {serializeError} from 'serialize-error';
+import * as React from "react";
+import { serializeError } from "serialize-error";
 
-import SuccessIcon from '../icons/SuccessIcon';
-import FailedIcon from '../icons/FailedIcon';
-import uniq from '../utils/uniq';
-import uniqBy from '../utils/uniqBy';
+import SuccessIcon from "../icons/SuccessIcon";
+import FailedIcon from "../icons/FailedIcon";
+import uniq from "../utils/uniq";
+import uniqBy from "../utils/uniqBy";
 
-import type {SyncNowResponse} from '../types';
-import CopyButton from './CopyButton';
+import type { SyncNowResponse } from "../types";
+import CopyButton from "./CopyButton";
 
-export default function ResultList({results}: {results: SyncNowResponse}) {
+export default function ResultList({ results }: { results: SyncNowResponse }) {
   const successfulCookies = Array.from(
     new Set(
       results.map((promiseResult) =>
-        promiseResult.status === 'fulfilled' ? promiseResult.value : null
-      )
-    )
+        promiseResult.status === "fulfilled" ? promiseResult.value : null,
+      ),
+    ),
   ).filter(Boolean);
 
   const cookies = uniqBy(
     successfulCookies.map((cookie) => cookie.cookie),
-    (cookie) => cookie.name
+    (cookie) => cookie.name,
   );
   const origins = uniq(successfulCookies.map((cookie) => cookie.origin));
 
@@ -37,7 +37,11 @@ export default function ResultList({results}: {results: SyncNowResponse}) {
             <tr key={cookie.name}>
               <td>{cookie.name}</td>
               <td>
-                <input disabled value={cookie.value} style={{width: '100%'}} />
+                <input
+                  disabled
+                  value={cookie.value}
+                  style={{ width: "100%" }}
+                />
               </td>
             </tr>
           ))}
@@ -51,7 +55,7 @@ export default function ResultList({results}: {results: SyncNowResponse}) {
         </thead>
         <tbody>
           {results.map((promiseResult, index) =>
-            promiseResult.status === 'fulfilled' ? null : (
+            promiseResult.status === "fulfilled" ? null : (
               /* eslint-disable-next-line react/no-array-index-key */
               <tr key={index} className="error-row">
                 <td>
@@ -59,10 +63,10 @@ export default function ResultList({results}: {results: SyncNowResponse}) {
                 </td>
                 <td colSpan={2}>
                   {JSON.stringify(serializeError(promiseResult.reason)) ||
-                    'Rejected'}
+                    "Rejected"}
                 </td>
               </tr>
-            )
+            ),
           )}
           {origins.map((origin) => (
             <tr key={origin} className="success-row">
@@ -79,7 +83,7 @@ export default function ResultList({results}: {results: SyncNowResponse}) {
                   text={results
                     .map((promiseResult) => {
                       if (
-                        promiseResult.status === 'fulfilled' &&
+                        promiseResult.status === "fulfilled" &&
                         promiseResult.value?.origin === origin
                       ) {
                         const {
@@ -92,10 +96,10 @@ export default function ResultList({results}: {results: SyncNowResponse}) {
                         } = promiseResult.value.cookie;
                         return `document.cookie='${name}=${value};domain=${domain};expires=${expirationDate};path=${path};samesite=${sameSite};';`;
                       }
-                      return '';
+                      return "";
                     })
                     .filter(Boolean)
-                    .join('\n')}
+                    .join("\n")}
                 />
               </td>
             </tr>

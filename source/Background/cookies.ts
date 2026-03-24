@@ -1,30 +1,32 @@
-import browser, {Cookies} from 'webextension-polyfill';
-import uniq from '../utils/uniq';
-import {originToDomain, stripOrgSlug, stripPort} from './domains';
-import type {Origin} from './domains';
+import { browser, type Browser } from "wxt/browser";
+import uniq from "../utils/uniq";
+import { originToDomain, stripOrgSlug, stripPort } from "./domains";
+import type { Origin } from "./domains";
 
 const cookieNames: ReadonlyArray<string> = [
-  'session', // Normal session cookie, you'll have this whether logged in or out
-  'sentry-su', // SUPERUSER_COOKIE_NAME
-  'su', // SUPERUSER_COOKIE_NAME
-  'sentry-staff', // STAFF_COOKIE_NAME
-  'staff', // STAFF_COOKIE_NAME
-  'sentry-sc', // CSRF_COOKIE_NAME
-  'sc', // CSRF_COOKIE_NAME
-  'sentry-sudo', // SUDO_COOKIE_NAME
-  'sudo', // SUDO_COOKIE_NAME
+  "session", // Normal session cookie, you'll have this whether logged in or out
+  "sentry-su", // SUPERUSER_COOKIE_NAME
+  "su", // SUPERUSER_COOKIE_NAME
+  "sentry-staff", // STAFF_COOKIE_NAME
+  "staff", // STAFF_COOKIE_NAME
+  "sentry-sc", // CSRF_COOKIE_NAME
+  "sc", // CSRF_COOKIE_NAME
+  "sentry-sudo", // SUDO_COOKIE_NAME
+  "sudo", // SUDO_COOKIE_NAME
 ];
 
 export function isKnownCookie(cookieName: string): boolean {
   return cookieNames.includes(cookieName);
 }
 
-async function getKnownCookieFor(origin: Origin): Promise<Cookies.Cookie[]> {
+async function getKnownCookieFor(
+  origin: Origin,
+): Promise<Browser.cookies.Cookie[]> {
   return (
     await Promise.all(
-      cookieNames.map((name) => browser.cookies.get({name, url: origin}))
+      cookieNames.map((name) => browser.cookies.get({ name, url: origin })),
     )
-  ).filter(Boolean);
+  ).filter((cookie): cookie is Browser.cookies.Cookie => Boolean(cookie));
 }
 
 /**
@@ -34,14 +36,14 @@ async function getKnownCookieFor(origin: Origin): Promise<Cookies.Cookie[]> {
  * @returns Map<Origin, Cookie[]>
  */
 export async function getCookiesByOrigin(
-  origins: Origin[]
-): Promise<Map<Origin, browser.Cookies.Cookie[]>> {
-  const cookiesByOrigin = new Map<Origin, Cookies.Cookie[]>();
+  origins: Origin[],
+): Promise<Map<Origin, Browser.cookies.Cookie[]>> {
+  const cookiesByOrigin = new Map<Origin, Browser.cookies.Cookie[]>();
   await Promise.all(
     uniq(origins).map(async (origin) => {
       const cookies = await getKnownCookieFor(origin);
       cookiesByOrigin.set(origin, cookies);
-    })
+    }),
   );
 
   return cookiesByOrigin;
@@ -57,16 +59,16 @@ export async function getCookiesByOrigin(
  */
 export async function setTargetCookie(
   targetOrigin: Origin,
-  cookie: Cookies.Cookie,
-  store: browser.Cookies.CookieStore
+  cookie: Browser.cookies.Cookie,
+  store: Browser.cookies.CookieStore,
 ): Promise<
   | {
       origin: Origin;
-      cookie: Cookies.Cookie;
+      cookie: Browser.cookies.Cookie;
     }
   | undefined
 > {
-  const details: browser.Cookies.SetDetailsType = {
+  const details: Browser.cookies.SetDetails = {
     url: targetOrigin,
     domain: stripPort(stripOrgSlug(originToDomain(targetOrigin))),
     expirationDate: cookie.expirationDate,
@@ -78,6 +80,14 @@ export async function setTargetCookie(
     value: cookie.value,
   };
   const updated = await browser.cookies.set(details);
-  console.log('setTargetCookie: set', {cookie, targetOrigin, details, updated});
-  return {origin: targetOrigin, cookie: updated};
+  console.log("setTargetCookie: set", {
+    cookie,
+    targetOrigin,
+    details,
+    updated,
+  });
+  if (!updated) {
+    return undefined;
+  }
+  return { origin: targetOrigin, cookie: updated };
 }

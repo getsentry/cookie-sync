@@ -1,7 +1,6 @@
-import * as React from 'react';
-import cmp from 'semver-compare';
-
-import packageJSON from '../../package.json';
+import * as React from "react";
+import cmp from "semver-compare";
+import { browser } from "wxt/browser";
 
 enum VersionStatus {
   Unknown,
@@ -10,10 +9,10 @@ enum VersionStatus {
   Behind,
 }
 
-type ReleasesResponse = {[key: string]: unknown; tag_name: string};
+type ReleasesResponse = { [key: string]: unknown; tag_name: string };
 
-function useReleasedVersions({currentVersion}: {currentVersion: string}) {
-  const [{status, data}, setReleases] = React.useState<{
+function useReleasedVersions({ currentVersion }: { currentVersion: string }) {
+  const [{ status, data }, setReleases] = React.useState<{
     status: number;
     data: undefined | ReleasesResponse[];
   }>({
@@ -23,7 +22,7 @@ function useReleasedVersions({currentVersion}: {currentVersion: string}) {
 
   const fetchReleases = async () => {
     const response = await fetch(
-      'https://api.github.com/repos/getsentry/cookie-sync/releases'
+      "https://api.github.com/repos/getsentry/cookie-sync/releases",
     );
     setReleases({
       status: response.status,
@@ -36,24 +35,25 @@ function useReleasedVersions({currentVersion}: {currentVersion: string}) {
   }, []);
 
   if (status === 0) {
-    return {status: VersionStatus.Loading};
+    return { status: VersionStatus.Loading };
   }
   if (status >= 200 && status < 300) {
-    const tags = data?.map((release) => release.tag_name.replace(/^v/, ''));
-    const newestRelease = tags?.sort(cmp).pop() || '0.0.0';
+    const tags = data?.map((release) => release.tag_name.replace(/^v/, ""));
+    const newestRelease = tags?.sort(cmp).pop() || "0.0.0";
     return cmp(newestRelease, currentVersion) === 1
-      ? {status: VersionStatus.Behind}
-      : {status: VersionStatus.UpToDate};
+      ? { status: VersionStatus.Behind }
+      : { status: VersionStatus.UpToDate };
   }
   if (status >= 400) {
-    return {status: VersionStatus.Behind};
+    return { status: VersionStatus.Behind };
   }
-  return {status: VersionStatus.Unknown};
+  return { status: VersionStatus.Unknown };
 }
 
 export default function VersionBadge() {
-  const {status} = useReleasedVersions({
-    currentVersion: packageJSON.version,
+  const currentVersion = browser.runtime.getManifest().version;
+  const { status } = useReleasedVersions({
+    currentVersion,
   });
 
   switch (status) {
@@ -61,28 +61,28 @@ export default function VersionBadge() {
       return (
         <div className="current-version">
           <div className="spinner" />
-          Your version: {packageJSON.version}
+          Your version: {currentVersion}
         </div>
       );
     case VersionStatus.UpToDate:
       return (
         <div className="current-version">
-          Your version (up to date): {packageJSON.version}
+          Your version (up to date): {currentVersion}
         </div>
       );
     case VersionStatus.Behind:
       return (
         <div className="current-version">
-          <div>Your version: {packageJSON.version}</div>
+          <div>Your version: {currentVersion}</div>
           <div>
-            A{' '}
+            A{" "}
             <a
               href="https://github.com/getsentry/cookie-sync/releases"
               target="_blank"
               rel="noreferrer"
             >
               newer version
-            </a>{' '}
+            </a>{" "}
             is available
           </div>
         </div>
