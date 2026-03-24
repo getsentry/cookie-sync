@@ -97,8 +97,6 @@ modules.xml
 logs
 *.log
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 lerna-debug.log*
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
@@ -154,9 +152,6 @@ typings/
 # Output of 'npm pack'
 *.tgz
 
-# Yarn Integrity file
-.yarn-integrity
-
 # dotenv environment variables file
 .env
 .env.test
@@ -195,12 +190,5 @@ dist/
 .output/
 .addfox/
 .wxt/
-
-# yarn 2
-# https://github.com/yarnpkg/berry/issues/454#issuecomment-530312089
-.yarn/*
-!.yarn/releases
-!.yarn/plugins
-.pnp.*
 
 .DS_Store
