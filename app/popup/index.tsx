@@ -16,9 +16,15 @@ Sentry.init({
   tracesSampleRate: 1.0,
 });
 
+const popupRoot =
+  document.getElementById('popup-root') ??
+  document.body.appendChild(
+    Object.assign(document.createElement('div'), {id: 'popup-root'})
+  );
+
 ReactDOM.render(
   <ErrorBoundary>
     <Popup />
   </ErrorBoundary>,
-  document.getElementById('popup-root')
+  popupRoot
 );

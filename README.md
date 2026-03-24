@@ -2,7 +2,7 @@
 
 A browser plugin to automatically sync cookies for local frontend development of sentry.io. This extension will copy cookies from sentry.io and make them available for your development environment, including version sandbox deployments.
 
-![](./source/assets/example-full-chrome.png)
+![](./public/assets/example-full-chrome.png)
 
 ## 🚀 Installation
 
@@ -19,12 +19,11 @@ You can download the bundled extension for your browser from the github releases
 
 _NOTE: Auto-update will not work with manual installations._
 
-- ### Chromium Based Browsers (Chrome, Edge, Opera)
+- ### Chromium Based Browsers (Chrome)
 
-    1. Visit: [`chrome://extensions`](chrome://extensions) or [`edge://extensions`](edge://extensions) or [`about://extensions`](about://extensions) (in opera).
+    1. Visit: [`chrome://extensions`](chrome://extensions).
     2. Enable `Developer Mode`
-        - Chrome/Opera: The toggle button is in the top-right corner 
-        - Edge: The toggle button is in the left sidebar
+        - Chrome: The toggle button is in the top-right corner
         - Refresh the page!
     3. Drag & drop the `.zip` file you downloaded into the page.
 
@@ -36,7 +35,7 @@ _NOTE: Auto-update will not work with manual installations._
         - Set `xpinstall.signatures.required = false`
         - Set `extensions.langpacks.signatures.required = false`
     3. Visit [about:addons](about:addons)
-    4. Drag & drop the `firefox.crx` file you downloaded into the page.
+    4. Drag & drop the Firefox `.zip` file you downloaded into the page.
 
 - ### Safari
 
@@ -60,22 +59,22 @@ Please file an issue [here](https://github.com/getsentry/cookie-sync/issues) for
 
 Ensure you have:
 
-- [Node.js](https://nodejs.org) 14 or later installed
-- [Yarn](https://yarnpkg.com) v1 or v2 installed
+- [Node.js](https://nodejs.org) 18 or later installed
+- [pnpm](https://pnpm.io) 9 or later installed
 
 Then run the following:
 
-- `yarn install` to install dependencies.
-- `yarn run dev:chrome` to start the development server for chrome extension
-- `yarn run dev:firefox` to start the development server for firefox addon
-- `yarn run build:chrome` to build chrome extension
-- `yarn run build:firefox` to build firefox addon
-- `yarn run build` builds and packs extensions all at once to `extension/` directory
+- `pnpm install` to install dependencies.
+- `pnpm run dev:chrome` to start the development server for the Chrome extension
+- `pnpm run dev:firefox` to start the development server for the Firefox addon
+- `pnpm run build:chrome` to build the Chromium package
+- `pnpm run build:firefox` to build the Firefox package
+- `pnpm run build` builds and packs both browsers into `.addfox/extension/`
 
 ### Test in Dev Mode
 
-1. `yarn install` to install dependencies.
-2. `yarn run dev:chrome` or `yarn run dev:firefox` To watch file changes in development
+1. `pnpm install` to install dependencies.
+2. `pnpm run dev:chrome` or `pnpm run dev:firefox` to watch file changes in development
 3. Load the extension in your browser
 
     _NOTE: Remove any existing versions first_
@@ -85,58 +84,36 @@ Then run the following:
     - Go to the browser address bar and type `chrome://extensions`.
     - Check the `Developer Mode` button to enable it.
     - Click on the `Load Unpacked Extension…` button.
-    - Select the folder `cookie-sync/extension/chrome`.
+    - Select the folder `cookie-sync/.addfox/extension/extension-chromium`.
 
     #### Firefox [ESR](https://www.mozilla.org/en-US/firefox/enterprise/), [Developer](https://www.mozilla.org/en-US/firefox/developer/), or [Nightly build](https://www.mozilla.org/en-US/firefox/channel/desktop/#nightly)
 
     - Go to the browser address bar and type `about:debugging#/runtime/this-firefox`.
-    - Click on the `Temporary Extensions` Section, then the `Load Unpacked Extension…` button.
-    - Select the file `cookie-sync/extension/firefox.xpi`.
+    - Click on the `Temporary Extensions` Section, then the `Load Temporary Add-on…` button.
+    - Select the file `cookie-sync/.addfox/extension/extension-firefox/manifest.json`.
 
 ### Test Prod builds
 
-- `yarn run build` builds the extension for all the browsers.
+- `pnpm run build` builds the extension for Chrome and Firefox.
 
-Note: By default the `package.json` and `manifest.json` are set with version `0.0.0`. The CI pipeline will set the version before building the bundles.
+Note: By default `package.json` is set to version `0.0.0`. The CI pipeline updates that version before building the bundles, and `addfox.config.ts` uses it as the manifest version source.
 
-### Generating browser specific manifest.json
+### Browser-specific manifests
 
-Update `source/manifest.json` file with browser vendor prefixed manifest keys
-
-```js
-{
-  "__chrome__name": "SuperChrome",
-  "__firefox__name": "SuperFox",
-  "__edge__name": "SuperEdge",
-  "__opera__name": "SuperOpera"
-}
-```
-
-if the vendor is `chrome` this compiles to:
+Update `addfox.config.ts` with per-browser manifest branches:
 
 ```js
 {
-  "name": "SuperChrome",
+  manifest: {
+    chromium: {
+      name: "SuperChrome"
+    },
+    firefox: {
+      name: "SuperFox"
+    }
+  }
 }
 ```
-
-Add keys to multiple vendors by separating them with | in the prefix
-
-```
-{
-  __chrome|opera__name: "SuperBlink"
-}
-```
-
-if the vendor is `chrome` or `opera`, this compiles to:
-
-```
-{
-  "name": "SuperBlink"
-}
-```
-
-See the original [README](https://github.com/abhijithvijayan/wext-manifest-loader) of `wext-manifest-loader` package for more details
 
 ## Publishing
 

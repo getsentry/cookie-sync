@@ -1,4 +1,4 @@
-import browser, {Cookies, Tabs} from 'webextension-polyfill';
+import browser, { Cookies, Tabs } from 'webextension-polyfill';
 
 import {
   Domain,
@@ -17,7 +17,7 @@ import toUrl from '../utils/toUrl';
 import uniq from '../utils/uniq';
 import uniqBy from '../utils/uniqBy';
 
-import type {Message, StorageClearResponse, SyncNowResponse} from '../types';
+import type { Message, SyncNowResponse } from '../types';
 
 function debugResults(
   event: string,
@@ -202,7 +202,7 @@ async function onTabUpdated(
  */
 async function onMessage(
   request: Message
-): Promise<SyncNowResponse | StorageClearResponse | false> {
+): Promise<SyncNowResponse | true | false> {
   if (!request.command) {
     return false;
   }
@@ -223,10 +223,6 @@ async function onMessage(
       console.log('cookie stores', stores);
       return results;
     }
-    case 'storage-clear':
-      await Storage.clear();
-      console.groupEnd();
-      return true;
     default:
       console.groupEnd();
       return false;

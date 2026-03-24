@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import Storage from '../Background/storage';
+import Storage from '../background/storage';
 
 import './domainsEnabled.css';
 import KnownOrgs from './KnownOrgs';

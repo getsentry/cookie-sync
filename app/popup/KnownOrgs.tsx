@@ -1,7 +1,7 @@
 import * as React from 'react';
 import browser from 'webextension-polyfill';
 
-import Storage from '../Background/storage';
+import Storage from '../background/storage';
 
 import './knownOrgs.css';
 import type {Message} from '../types';

@@ -11,19 +11,24 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      node-version: 19.x # See Node.js release schedule: https://nodejs.org/en/about/releases/
+      node-version: 20.x # See Node.js release schedule: https://nodejs.org/en/about/releases/
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Setup Node v${{ env.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.node-version }}
-          cache: 'yarn'
-      
-      - run: yarn install --frozen-lockfile
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
 
       - name: Fetch next version
         uses: mathieudutour/github-tag-action@v6.1
@@ -39,26 +44,20 @@ jobs:
           jq -r '.version |= "${{ steps.find_version.outputs.new_version }}"' tmp.json > package.json;
           rm -rf tmp.json
 
-      - name: Set manifest.json version to ${{ steps.find_version.outputs.new_tag }}
-        run: >
-          cp source/manifest.json tmp.json;
-          jq -r '.version |= "${{ steps.find_version.outputs.new_version }}"' tmp.json > source/manifest.json;
-          rm -rf tmp.json
+      - run: pnpm run lint
 
-      - run: yarn run lint
-
-      - run: yarn run build
+      - run: pnpm run build
 
       - uses: actions/upload-artifact@master
         with:
           name: extensions
-          path: extension/
+          path: .addfox/
 
   package:
     needs: build
     runs-on: ubuntu-latest
     env:
-      node-version: 19.x # See Node.js release schedule: https://nodejs.org/en/about/releases/
+      node-version: 20.x # See Node.js release schedule: https://nodejs.org/en/about/releases/
     outputs:
       new_tag: ${{ steps.tag_version.outputs.new_tag }}
 
@@ -66,7 +65,7 @@ jobs:
       - uses: actions/download-artifact@master
         with:
           name: extensions
-          path: extension/
+          path: .addfox/
 
       - name: Bump version and push tag
         uses: mathieudutour/github-tag-action@v6.1
@@ -81,13 +80,13 @@ jobs:
           tag: ${{ steps.tag_version.outputs.new_tag }}
           name: Release ${{ steps.tag_version.outputs.new_tag }}
           body: ${{ steps.tag_version.outputs.changelog }}
-          artifacts: extension/chrome.zip, extension/edge.zip, extension/opera.zip, extension/firefox.xpi
+          artifacts: .addfox/extension/extension-chromium.zip, .addfox/extension/extension-firefox.zip
 
   upload:
     needs: package
     runs-on: ubuntu-latest
     env:
-      node-version: 19.x # See Node.js release schedule: https://nodejs.org/en/about/releases/
+      node-version: 20.x # See Node.js release schedule: https://nodejs.org/en/about/releases/
 
     strategy:
       fail-fast: false
@@ -100,11 +99,11 @@ jobs:
       - uses: actions/download-artifact@master
         with:
           name: extensions
-          path: extension/
+          path: .addfox/
 
       - name: Submit to Google
         if: matrix.command == 'chrome'
-        run: npx chrome-webstore-upload-cli@2 upload --auto-publish --source extension/chrome.zip
+        run: npx chrome-webstore-upload-cli@2 upload --auto-publish --source .addfox/extension/extension-chromium.zip
         env:
           EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
           CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
@@ -113,7 +112,7 @@ jobs:
 
       - name: Submit to Mozilla
         if: matrix.command == 'firefox'
-        run: npx web-ext-submit@7 --no-input --source-dir extension/firefox
+        run: npx web-ext-submit@7 --no-input --source-dir .addfox/extension/extension-firefox
         env:
           WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
           WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}

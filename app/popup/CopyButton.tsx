@@ -6,8 +6,9 @@ interface Props {
 
 export default function CopyButton({text}: Props) {
   const timeoutRef = React.useRef<undefined | ReturnType<typeof setTimeout>>();
-  const [state, setState] =
-    React.useState<'ready' | 'copied' | 'error'>('ready');
+  const [state, setState] = React.useState<'ready' | 'copied' | 'error'>(
+    'ready'
+  );
 
   const handleOnClick = React.useCallback(() => {
     navigator.clipboard

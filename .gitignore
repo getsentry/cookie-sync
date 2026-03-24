@@ -170,7 +170,7 @@ typings/
 # nuxt.js build output
 .nuxt
 
-# react / gatsby 
+# react / gatsby
 public/
 
 # vuepress build output
@@ -194,6 +194,7 @@ public/
 ## Build directory
 extension/
 dist/
+.addfox/
 .awcache
 
 # yarn 2
@@ -204,3 +205,5 @@ dist/
 .pnp.*
 
 .DS_Store
+!public/
+!public/**

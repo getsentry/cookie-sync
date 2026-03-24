@@ -24,11 +24,14 @@
 		}],
 		"@typescript-eslint/explicit-function-return-type": "off",
 		"@typescript-eslint/explicit-module-boundary-types": "off",
+		"@typescript-eslint/object-curly-spacing": "off",
+		"@typescript-eslint/no-unnecessary-type-constraint": "off",
 		"@typescript-eslint/no-unused-vars": ["error", {
 			"argsIgnorePattern": "^_",
 			"caughtErrorsIgnorePattern": "^-",
 			"varsIgnorePattern": "^_"
-		}]
+		}],
+		"prettier/prettier": "off"
 
 	},
 	"env": {
@@ -36,7 +39,15 @@
 	},
 	"settings": {
 		"node": {
-			"tryExtensions": [".tsx"] // append tsx to the list as well
+			"tryExtensions": [".tsx"]
 		}
-	}
+	},
+	"overrides": [
+		{
+			"files": ["addfox.config.ts"],
+			"rules": {
+				"import/no-extraneous-dependencies": "off"
+			}
+		}
+	]
 }
