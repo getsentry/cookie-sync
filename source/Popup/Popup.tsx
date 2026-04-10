@@ -47,7 +47,7 @@ export default function Popup() {
                 }
 
                 const newUrl = tab.url?.replace(
-                  /([^/\s]+\.sentry\.dev|sentry\.io)$/,
+                  /([^/\s]+\.sentry\.dev|sentry\.io)/,
                   'dev.getsentry.net:7999'
                 );
                 return browser.tabs.create({url: newUrl});
