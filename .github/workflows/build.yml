@@ -11,7 +11,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      node-version: 19.x # See Node.js release schedule: https://nodejs.org/en/about/releases/
+      node-version: 22.x # See Node.js release schedule: https://nodejs.org/en/about/releases/
 
     steps:
       - name: Checkout
@@ -58,7 +58,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env:
-      node-version: 19.x # See Node.js release schedule: https://nodejs.org/en/about/releases/
+      node-version: 22.x # See Node.js release schedule: https://nodejs.org/en/about/releases/
     outputs:
       new_tag: ${{ steps.tag_version.outputs.new_tag }}
 
@@ -87,7 +87,7 @@ jobs:
     needs: package
     runs-on: ubuntu-latest
     env:
-      node-version: 19.x # See Node.js release schedule: https://nodejs.org/en/about/releases/
+      node-version: 22.x # See Node.js release schedule: https://nodejs.org/en/about/releases/
 
     strategy:
       fail-fast: false
